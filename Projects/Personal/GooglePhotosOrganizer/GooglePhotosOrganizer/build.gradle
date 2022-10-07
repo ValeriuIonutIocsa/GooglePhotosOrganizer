@@ -1,6 +1,8 @@
 ext {
-    mainClass = 'com.personal.utils.AppStart' + project.name
+    mainClass = 'com.personal.g_photos.AppStart' + project.name
     projectVersion = '0.0.1'
+    convertToExe = false
+    jarFolderPath = 'C:\\IVI\\Apps\\GooglePhotosOrganizer'
 
     subProjectNames = [
             ':io-utils'

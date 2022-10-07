@@ -49,6 +49,7 @@ final class AppStartGooglePhotosOrganizer {
 			final String inputFolderPathString,
 			final String outputFolderPathString) {
 
+		Logger.printNewLine();
 		Logger.printProgress("GooglePhotosOrganizer starting");
 
 		if (!IoUtils.fileExists(inputFolderPathString)) {
