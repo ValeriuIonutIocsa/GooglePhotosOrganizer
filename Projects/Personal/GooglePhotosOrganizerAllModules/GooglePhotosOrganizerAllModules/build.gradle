@@ -1,0 +1,14 @@
+ext {
+    mainClass = 'com.personal.utils.AppStart' + project.name
+    projectVersion = '0.0.1'
+
+    subProjectNames = [
+            ':GooglePhotosOrganizer'
+    ]
+    compileClassPaths = []
+    compileJarFilePaths = []
+    testCompileClassPaths = []
+    testCompileJarFilePaths = []
+}
+
+apply from: gradle.ext.rootDirPath + '/common_build.gradle'
