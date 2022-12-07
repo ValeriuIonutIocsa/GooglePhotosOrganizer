@@ -2,7 +2,6 @@ package com.utils.io;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -45,20 +44,6 @@ public final class IoUtils {
 	}
 
 	@ApiMethod
-	public static long fileSize(
-			final String filePathString) {
-
-		long size = -1;
-		try {
-			final Path filePath = Paths.get(filePathString);
-			size = Files.size(filePath);
-
-		} catch (final Exception ignored) {
-		}
-		return size;
-	}
-
-	@ApiMethod
 	public static long fileLastModifiedTime(
 			final String filePathString) {
 
@@ -67,7 +52,10 @@ public final class IoUtils {
 			final Path filePath = Paths.get(filePathString);
 			lastModifiedTime = Files.getLastModifiedTime(filePath).toMillis();
 
-		} catch (final Exception ignored) {
+		} catch (final Exception exc) {
+			Logger.printError("failed to compute last modified time of file:" +
+					System.lineSeparator() + filePathString);
+			Logger.printException(exc);
 		}
 		return lastModifiedTime;
 	}
@@ -82,7 +70,10 @@ public final class IoUtils {
 			final MessageDigest messageDigestMd5 = MessageDigest.getInstance("MD5");
 			md5HashCode = messageDigestMd5.digest(fileBytes);
 
-		} catch (final Exception ignored) {
+		} catch (final Exception exc) {
+			Logger.printError("failed to compute MD5 hash code of file:" +
+					System.lineSeparator() + filePathString);
+			Logger.printException(exc);
 		}
 		return md5HashCode;
 	}
@@ -107,15 +98,60 @@ public final class IoUtils {
 	}
 
 	@ApiMethod
-	public static File createTemporaryFile(
-			final InputStream inputStream) throws IOException {
+	public static String createTmpFile(
+			final String filePathString,
+			final String tmpFilePathString) {
 
-		final File tempFile = File.createTempFile(StrUtils.createDateTimeString(), ".tmp");
-		tempFile.deleteOnExit();
-		try (OutputStream outputStream = Files.newOutputStream(tempFile.toPath())) {
-			IOUtils.copy(inputStream, outputStream);
+		String resultTmpFilePathString = null;
+		try {
+			final File tmpFile;
+			if (tmpFilePathString != null) {
+				tmpFile = new File(tmpFilePathString);
+			} else {
+				tmpFile = File.createTempFile(StrUtils.createDateTimeString(), ".tmp");
+			}
+
+			tmpFile.deleteOnExit();
+
+			try (InputStream inputStream = StreamUtils.openInputStream(filePathString);
+					OutputStream outputStream = Files.newOutputStream(tmpFile.toPath())) {
+				IOUtils.copy(inputStream, outputStream);
+			}
+			resultTmpFilePathString = tmpFile.getPath();
+
+		} catch (final Exception exc) {
+			Logger.printError("failed to create temporary file");
+			Logger.printException(exc);
 		}
-		return tempFile;
+		return resultTmpFilePathString;
+	}
+
+	@ApiMethod
+	public static String createTmpFile(
+			final InputStream inputStream,
+			final String tmpFilePathString) {
+
+		String resultTmpFilePathString = null;
+		try {
+			final File tmpFile;
+			if (tmpFilePathString != null) {
+				tmpFile = new File(tmpFilePathString);
+			} else {
+				tmpFile = File.createTempFile(StrUtils.createDateTimeString(), ".tmp");
+			}
+
+			tmpFile.deleteOnExit();
+
+			try (OutputStream outputStream = Files.newOutputStream(tmpFile.toPath())) {
+				IOUtils.copy(inputStream, outputStream);
+			}
+			resultTmpFilePathString = tmpFile.getPath();
+
+		} catch (final Exception exc) {
+			Logger.printError("failed to create temporary file");
+			Logger.printException(exc);
+		}
+		return resultTmpFilePathString;
 	}
 
 	@ApiMethod

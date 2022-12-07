@@ -10,12 +10,14 @@ public class EnvProviderTest implements EnvProvider {
 	public static void setEnv(
 			final String name,
 			final String value) {
+
 		ENV.put(name, value);
 	}
 
 	@Override
 	public String getEnv(
 			final String name) {
-		return ENV.getOrDefault(name, null);
+
+		return ENV.get(name);
 	}
 }

@@ -1,7 +1,6 @@
 package com.utils.net.proxy.settings;
 
 import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 import javax.crypto.Cipher;
@@ -12,6 +11,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 import com.utils.crypt.EncryptionUtils;
 import com.utils.io.IoUtils;
+import com.utils.io.PathUtils;
 import com.utils.io.StreamUtils;
 import com.utils.log.Logger;
 import com.utils.string.StrUtils;
@@ -60,6 +60,6 @@ public final class FactoryProxySettings {
 	}
 
 	static String createProxySettingsPathString() {
-		return Paths.get(SystemUtils.USER_HOME, "IVIProxySettings.encrypted").toString();
+		return PathUtils.computePath(SystemUtils.USER_HOME, "IVIProxySettings.encrypted");
 	}
 }

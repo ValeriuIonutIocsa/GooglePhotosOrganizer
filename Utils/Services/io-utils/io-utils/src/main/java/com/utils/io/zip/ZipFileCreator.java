@@ -107,8 +107,8 @@ public class ZipFileCreator {
 										Logger.printLine("zipping file: " + filePath);
 									}
 
-									final String relativeFilePathString =
-											PathUtils.computeRelativePathString(srcFilePathString, srcFilePathString);
+									final Path relativeFilePath = srcFilePath.relativize(filePath);
+									final String relativeFilePathString = relativeFilePath.toString();
 									final Path zipFilePath = zipFileSystem.getPath(relativeFilePathString);
 									final Path zipFileParentFolderPath = zipFilePath.getParent();
 									if (zipFileParentFolderPath != null &&

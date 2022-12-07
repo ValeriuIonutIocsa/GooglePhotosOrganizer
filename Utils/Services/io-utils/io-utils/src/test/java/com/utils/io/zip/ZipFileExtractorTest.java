@@ -8,8 +8,8 @@ class ZipFileExtractorTest {
 	@Test
 	void testWork() {
 
-		final String zipArchiveFilePathString = "D:\\IVI_MISC\\Misc\\nf\\tmp\\abcd.zip";
-		final String dstFolderPathString = "D:\\IVI_MISC\\Misc\\nf\\tmp";
+		final String zipArchiveFilePathString = "D:\\IVI_MISC\\Misc\\mnf\\tmp\\abcd.zip";
+		final String dstFolderPathString = "D:\\IVI_MISC\\Misc\\mnf\\tmp";
 		final boolean useTempFile = true;
 		final boolean deleteExisting = false;
 		final int threadCount = 12;

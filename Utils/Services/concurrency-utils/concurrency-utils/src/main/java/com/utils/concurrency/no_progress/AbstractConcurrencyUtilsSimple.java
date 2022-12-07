@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import com.utils.concurrency.AbstractConcurrencyUtils;
+import com.utils.log.Logger;
 
 public abstract class AbstractConcurrencyUtilsSimple extends AbstractConcurrencyUtils {
 
@@ -42,6 +44,19 @@ public abstract class AbstractConcurrencyUtilsSimple extends AbstractConcurrency
 			}
 
 			executorService.shutdown();
+
+			boolean awaitTerminationSuccess = false;
+			try {
+				awaitTerminationSuccess = executorService.awaitTermination(10, TimeUnit.SECONDS);
+
+			} catch (final Exception exc) {
+				Logger.printException(exc);
+
+			} finally {
+				if (!awaitTerminationSuccess) {
+					Logger.printError("failed to await termination of multi-threaded tasks");
+				}
+			}
 		}
 	}
 

@@ -24,7 +24,7 @@ class FolderCreatorImpl implements FolderCreator {
 		final boolean success;
 		if (filePathString != null) {
 
-			final String parentFolderPathString = PathUtils.computeParentPathString(filePathString);
+			final String parentFolderPathString = PathUtils.computeParentPath(filePathString);
 			if (parentFolderPathString != null) {
 				success = createDirectories(parentFolderPathString, verbose);
 			} else {
@@ -46,7 +46,7 @@ class FolderCreatorImpl implements FolderCreator {
 		final boolean success;
 		if (filePathString != null) {
 
-			final String parentFolderPathString = PathUtils.computeParentPathString(filePathString);
+			final String parentFolderPathString = PathUtils.computeParentPath(filePathString);
 			if (parentFolderPathString != null) {
 				success = createDirectoriesNoCheck(parentFolderPathString, verbose);
 			} else {

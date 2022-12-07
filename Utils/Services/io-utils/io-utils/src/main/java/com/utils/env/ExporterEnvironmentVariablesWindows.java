@@ -1,13 +1,11 @@
 package com.utils.env;
 
-import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import com.utils.annotations.ApiMethod;
+import com.utils.io.StreamUtils;
 import com.utils.io.processes.InputStreamReaderThread;
 import com.utils.io.processes.ReadBytesHandlerOutputStream;
 import com.utils.log.Logger;
@@ -15,19 +13,19 @@ import com.utils.string.StrUtils;
 
 public class ExporterEnvironmentVariablesWindows implements ExporterEnvironmentVariables {
 
-	private final Path outputPath;
+	private final String outputPathString;
 
 	ExporterEnvironmentVariablesWindows(
-			final Path outputPath) {
+			final String outputPathString) {
 
-		this.outputPath = outputPath;
+		this.outputPathString = outputPathString;
 	}
 
 	@ApiMethod
 	@Override
 	public void work() {
 
-		try (OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(outputPath))) {
+		try (OutputStream outputStream = StreamUtils.openBufferedOutputStream(outputPathString)) {
 
 			final Process process = new ProcessBuilder()
 					.command("cmd", "/c", "set")

@@ -966,4 +966,20 @@ public final class StrUtils {
 		}
 		return byteArray;
 	}
+
+	@ApiMethod
+	public static String stackTraceToString(
+            final StackTraceElement[] stackTraceElementArray) {
+
+		final StringBuilder sbStackTrace = new StringBuilder();
+		for (int i = 0; i < stackTraceElementArray.length; i++) {
+
+			final StackTraceElement stackTraceElement = stackTraceElementArray[i];
+			sbStackTrace.append(stackTraceElement);
+			if (i < stackTraceElementArray.length - 1) {
+				sbStackTrace.append(System.lineSeparator());
+			}
+		}
+		return sbStackTrace.toString();
+	}
 }

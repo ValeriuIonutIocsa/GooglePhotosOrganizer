@@ -1,7 +1,5 @@
 package com.utils.io;
 
-import java.nio.file.Paths;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +8,7 @@ import com.utils.log.Logger;
 class FileLockerTest {
 
 	private static final String LOCK_FILE_PATH_STRING =
-			Paths.get(PathUtils.ROOT_PATH, "tmp", "FileLockerTest", "lock_file.txt").toString();
+			PathUtils.computePath(PathUtils.ROOT_PATH, "tmp", "FileLockerTest", "lock_file.txt");
 
 	@Test
 	void testLock() throws Exception {

@@ -73,22 +73,23 @@ public class ZipFileExtractor {
 					ZipUtils.openZipFileSystem(zipArchiveFilePathString, useTempFile)) {
 
 				final List<Runnable> runnableList = new ArrayList<>();
-				final Path root = zipFileSystem.getPath("/");
-				Files.walkFileTree(root, new SimpleFileVisitor<>() {
+				final Path zipFileRootPath = zipFileSystem.getPath("/");
+				Files.walkFileTree(zipFileRootPath, new SimpleFileVisitor<>() {
 
 					@Override
 					public FileVisitResult visitFile(
 							final Path filePath,
 							final BasicFileAttributes attrs) throws IOException {
 
+						final String filePathString = filePath.toString();
 						runnableList.add(() -> {
 
 							try {
 								if (verbose) {
-									Logger.printLine("extracting file: " + filePath);
+									Logger.printLine("extracting file: " + filePathString);
 								}
 
-								final Path dstFilePath = Paths.get(dstFolderPathString, filePath.toString());
+								final Path dstFilePath = Paths.get(dstFolderPathString, filePathString);
 								final Path dstFileParentFolderPath = dstFilePath.getParent();
 								if (Files.notExists(dstFileParentFolderPath)) {
 									synchronized (this) {
@@ -102,7 +103,8 @@ public class ZipFileExtractor {
 								}
 
 							} catch (final Exception exc) {
-								Logger.printError("failed to extract file:" + System.lineSeparator() + filePath);
+								Logger.printError("failed to extract file:" +
+										System.lineSeparator() + filePathString);
 								Logger.printException(exc);
 							}
 						});

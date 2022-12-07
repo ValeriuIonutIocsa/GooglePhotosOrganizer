@@ -29,7 +29,7 @@ public final class CliUtils {
 			final Map<String, String> cliArgsByNameMap,
 			final String argName) {
 
-		final String valueString = cliArgsByNameMap.getOrDefault(argName, null);
+		final String valueString = cliArgsByNameMap.get(argName);
 		return Boolean.parseBoolean(valueString);
 	}
 }

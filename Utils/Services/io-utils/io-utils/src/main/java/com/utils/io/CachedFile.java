@@ -24,7 +24,7 @@ public class CachedFile<
 
 		try {
 			this.filePathString = filePathString;
-			size = IoUtils.fileSize(filePathString);
+			size = FileSizeUtils.fileSize(filePathString);
 			lastModifiedTime = IoUtils.fileLastModifiedTime(filePathString);
 			this.dataObject = dataObject;
 
@@ -48,7 +48,7 @@ public class CachedFile<
 			}
 			if (parseFile) {
 
-				final long size = IoUtils.fileSize(filePathString);
+				final long size = FileSizeUtils.fileSize(filePathString);
 				if (this.size == size) {
 
 					final long lastModifiedTime = IoUtils.fileLastModifiedTime(filePathString);
