@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import com.utils.io.IoUtils;
@@ -31,15 +32,34 @@ final class AppStartGooglePhotosOrganizer {
 		final Instant start = Instant.now();
 		Logger.setDebugMode(true);
 
-		if (args.length < 2) {
-
-			Logger.printError("insufficient arguments");
+		final String firstArg;
+		if (args.length >= 1) {
+			firstArg = args[0];
+		} else {
+			firstArg = null;
+		}
+		if (StringUtils.isBlank(firstArg)) {
+			Logger.printError("invalid first argument");
 			System.exit(-1);
 		}
 
-		final String inputFolderPathString = args[0];
-		final String outputFolderPathString = args[1];
-		work(inputFolderPathString, outputFolderPathString);
+		if ("/?".equals(firstArg) || "--help".equals(firstArg)) {
+			Logger.printLine("usage: google_photos_organizer INPUT_FOLDER_PATH OUTPUT_FOLDER_PATH");
+			System.exit(0);
+		}
+
+		final String secondArg;
+		if (args.length >= 2) {
+			secondArg = args[1];
+		} else {
+			secondArg = null;
+		}
+		if (StringUtils.isBlank(secondArg)) {
+			Logger.printError("invalid second argument");
+			System.exit(-2);
+		}
+
+		work(firstArg, secondArg);
 
 		Logger.printNewLine();
 		Logger.printFinishMessage(start);
