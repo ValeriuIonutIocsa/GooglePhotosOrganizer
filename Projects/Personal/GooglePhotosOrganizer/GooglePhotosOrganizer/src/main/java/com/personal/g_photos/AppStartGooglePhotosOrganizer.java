@@ -187,8 +187,7 @@ final class AppStartGooglePhotosOrganizer {
 			final JSONObject photoTakenTimeJsonObject = jsonObject.getJSONObject("photoTakenTime");
 			final String formattedPhotoTakenTime = photoTakenTimeJsonObject.getString("formatted");
 
-			photoTakenTimeInstant = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss a z").parse(
-					formattedPhotoTakenTime).toInstant();
+			photoTakenTimeInstant = parseInstantFromString(formattedPhotoTakenTime);
 
 		} catch (final Exception exc) {
 			Logger.printProgress("failed to parse photo taken time from JSON file:" +
@@ -196,5 +195,22 @@ final class AppStartGooglePhotosOrganizer {
 			Logger.printException(exc);
 		}
 		return photoTakenTimeInstant;
+	}
+
+	static Instant parseInstantFromString(
+			final String formattedPhotoTakenTime) {
+
+		Instant instant = null;
+		try {
+			final String processedFormattedPhotoTakenTime =
+					StringUtils.replaceChars(formattedPhotoTakenTime, '\u202f', ' ');
+			instant = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss a z")
+					.parse(processedFormattedPhotoTakenTime).toInstant();
+
+		} catch (final Exception exc) {
+			Logger.printError("failed to parse data from string " + formattedPhotoTakenTime);
+			Logger.printException(exc);
+		}
+		return instant;
 	}
 }
