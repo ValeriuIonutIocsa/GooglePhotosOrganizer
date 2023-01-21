@@ -2,7 +2,6 @@ package com.utils.log;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.function.BiConsumer;
 
 import com.utils.annotations.ApiMethod;
 import com.utils.string.StrUtils;
@@ -11,7 +10,7 @@ import com.utils.string.junit.JUnitUtils;
 
 public final class Logger {
 
-	private static final MessageConsumer MESSAGE_CONSUMER = new MessageConsumer();
+	private static MessageConsumer messageConsumer = new MessageConsumerDefault();
 
 	private static boolean debugMode;
 
@@ -196,18 +195,18 @@ public final class Logger {
 	private static void printMessage(
 			final MessageLevel info,
 			final String message) {
-		MESSAGE_CONSUMER.printMessage(info, message);
+		messageConsumer.printMessage(info, message);
 	}
 
 	@ApiMethod
 	public static void setMessageConsumer(
-			final BiConsumer<MessageLevel, String> printFunction) {
-		MESSAGE_CONSUMER.setMessageConsumer(printFunction);
+			final MessageConsumer messageConsumer) {
+		Logger.messageConsumer = messageConsumer;
 	}
 
 	@ApiMethod
 	public static MessageConsumer getMessageConsumer() {
-		return MESSAGE_CONSUMER;
+		return messageConsumer;
 	}
 
 	@ApiMethod

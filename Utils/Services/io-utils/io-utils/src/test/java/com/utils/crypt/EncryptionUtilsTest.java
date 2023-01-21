@@ -25,7 +25,7 @@ class EncryptionUtilsTest {
 		final String originalString = "how to do in java.com";
 
 		final String encryptedFilePathString =
-				PathUtils.computePath(PathUtils.ROOT_PATH, "tmp", "test.encrypted");
+				PathUtils.computePath(PathUtils.createRootPath(), "tmp", "test.encrypted");
 		Logger.printProgress("generating encrypted file:");
 		Logger.printLine(encryptedFilePathString);
 
@@ -54,7 +54,7 @@ class EncryptionUtilsTest {
 		properties.put(key, value);
 
 		final String encryptedFilePathString =
-				PathUtils.computePath(PathUtils.ROOT_PATH, "tmp", "test_properties.encrypted");
+				PathUtils.computePath(PathUtils.createRootPath(), "tmp", "test_properties.encrypted");
 		Logger.printProgress("generating encrypted file:");
 		Logger.printLine(encryptedFilePathString);
 

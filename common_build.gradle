@@ -352,6 +352,13 @@ eclipse {
     }
 }
 
+eclipse.classpath.file {
+    whenMerged { classpath ->
+        def testDependencies = classpath.entries.findAll { entry -> entry instanceof org.gradle.plugins.ide.eclipse.model.ProjectDependency && entry.entryAttributes.test }
+        classpath.entries.removeAll testDependencies
+    }
+}
+
 def eclipseResourceEncoding = tasks.register('eclipseResourceEncoding')
 // encoding will be defined when eclipse task runs
 tasks.named('eclipse') { dependsOn(eclipseResourceEncoding) }

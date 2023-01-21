@@ -7,7 +7,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
+import java.time.Instant;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +46,7 @@ public final class IoUtils {
 	}
 
 	@ApiMethod
-	public static long fileLastModifiedTime(
+	public static long computeFileLastModifiedTime(
 			final String filePathString) {
 
 		long lastModifiedTime = -1;
@@ -58,6 +60,22 @@ public final class IoUtils {
 			Logger.printException(exc);
 		}
 		return lastModifiedTime;
+	}
+
+	@ApiMethod
+	public static void configureFileLastModifiedTime(
+			final String filePathString,
+			final Instant lastModifiedTimeInstant) {
+
+		try {
+			final Path filePath = Paths.get(filePathString);
+			Files.setLastModifiedTime(filePath, FileTime.from(lastModifiedTimeInstant));
+
+		} catch (final Exception exc) {
+			Logger.printError("failed to configure last modified time of file:" +
+					System.lineSeparator() + filePathString);
+			Logger.printException(exc);
+		}
 	}
 
 	@ApiMethod

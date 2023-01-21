@@ -88,12 +88,12 @@ public class FileLocker {
 
 				fileLock.release();
 				if (fileChannel == null) {
-					Logger.printError("file channel is null!");
+					Logger.printError("file channel is null");
 
 				} else {
 					fileChannel.close();
 					if (randomAccessFile == null) {
-						Logger.printError("random access file is null!");
+						Logger.printError("random access file is null");
 
 					} else {
 						randomAccessFile.close();

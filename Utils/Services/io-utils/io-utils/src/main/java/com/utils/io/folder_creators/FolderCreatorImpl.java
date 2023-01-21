@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import com.utils.annotations.ApiMethod;
 import com.utils.io.IoUtils;
 import com.utils.io.PathUtils;
+import com.utils.io.file_deleters.FactoryFileDeleter;
 import com.utils.log.Logger;
 import com.utils.string.StrUtils;
 
@@ -65,11 +66,23 @@ class FolderCreatorImpl implements FolderCreator {
 			final String directoryPathString,
 			final boolean verbose) {
 
-		final boolean success;
-		if (directoryPathString != null && !IoUtils.directoryExists(directoryPathString)) {
-			success = createDirectoriesNoCheck(directoryPathString, verbose);
-		} else {
+		boolean success = false;
+		if (directoryPathString == null || IoUtils.directoryExists(directoryPathString)) {
 			success = true;
+
+		} else {
+			if (IoUtils.fileExists(directoryPathString)) {
+
+				final boolean deleteFileSuccess =
+						FactoryFileDeleter.getInstance().deleteFile(directoryPathString, verbose);
+				if (deleteFileSuccess) {
+					success = createDirectoriesNoCheck(directoryPathString, verbose);
+				}
+
+			} else {
+				success = createDirectoriesNoCheck(directoryPathString, verbose);
+			}
+
 		}
 		return success;
 	}
@@ -102,11 +115,23 @@ class FolderCreatorImpl implements FolderCreator {
 			final String directoryPathString,
 			final boolean verbose) {
 
-		final boolean success;
-		if (directoryPathString != null && !IoUtils.directoryExists(directoryPathString)) {
-			success = createDirectoryNoChecks(directoryPathString, verbose);
-		} else {
+		boolean success = false;
+		if (directoryPathString == null || IoUtils.directoryExists(directoryPathString)) {
 			success = true;
+
+		} else {
+			if (IoUtils.fileExists(directoryPathString)) {
+
+				final boolean deleteFileSuccess =
+						FactoryFileDeleter.getInstance().deleteFile(directoryPathString, verbose);
+				if (deleteFileSuccess) {
+					success = createDirectoryNoChecks(directoryPathString, verbose);
+				}
+
+			} else {
+				success = createDirectoryNoChecks(directoryPathString, verbose);
+			}
+
 		}
 		return success;
 	}

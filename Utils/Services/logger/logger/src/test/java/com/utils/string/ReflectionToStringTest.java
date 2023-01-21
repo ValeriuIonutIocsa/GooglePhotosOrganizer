@@ -124,7 +124,7 @@ class ReflectionToStringTest {
 		TestClass5 testClass5;
 
 		TestClass4(
-				TestClass5 testClass5) {
+				final TestClass5 testClass5) {
 
 			this.testClass5 = testClass5;
 		}
@@ -136,7 +136,7 @@ class ReflectionToStringTest {
 		TestClass4 testClass4;
 
 		TestClass5(
-				TestClass4 testClass4) {
+				final TestClass4 testClass4) {
 
 			this.testClass4 = testClass4;
 		}

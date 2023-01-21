@@ -52,6 +52,7 @@ public final class FileSizeUtils {
 	public static String humanReadableByteCountBin(
 			final long bytes) {
 
+		final String result;
 		final long absB;
 		if (bytes == Long.MIN_VALUE) {
 			absB = Long.MAX_VALUE;
@@ -59,16 +60,19 @@ public final class FileSizeUtils {
 			absB = Math.abs(bytes);
 		}
 		if (absB < 1024) {
-			return bytes + " B";
-		}
-		long value = absB;
-		final CharacterIterator ci = new StringCharacterIterator("KMGTPE");
-		for (int i = 40; i >= 0 && absB > 0xfffccccccccccccL >> i; i -= 10) {
+			result = bytes + " B";
 
-			value >>= 10;
-			ci.next();
+		} else {
+			long value = absB;
+			final CharacterIterator ci = new StringCharacterIterator("KMGTPE");
+			for (int i = 40; i >= 0 && absB > 0xfffccccccccccccL >> i; i -= 10) {
+
+				value >>= 10;
+				ci.next();
+			}
+			value *= Long.signum(bytes);
+			result = String.format("%.1f %ciB", value / 1024.0, ci.current());
 		}
-		value *= Long.signum(bytes);
-		return String.format("%.1f %ciB", value / 1024.0, ci.current());
+		return result;
 	}
 }

@@ -25,7 +25,7 @@ public class CachedFile<
 		try {
 			this.filePathString = filePathString;
 			size = FileSizeUtils.fileSize(filePathString);
-			lastModifiedTime = IoUtils.fileLastModifiedTime(filePathString);
+			lastModifiedTime = IoUtils.computeFileLastModifiedTime(filePathString);
 			this.dataObject = dataObject;
 
 		} catch (final Exception exc) {
@@ -51,7 +51,7 @@ public class CachedFile<
 				final long size = FileSizeUtils.fileSize(filePathString);
 				if (this.size == size) {
 
-					final long lastModifiedTime = IoUtils.fileLastModifiedTime(filePathString);
+					final long lastModifiedTime = IoUtils.computeFileLastModifiedTime(filePathString);
 					cached = this.lastModifiedTime == lastModifiedTime;
 				}
 			}

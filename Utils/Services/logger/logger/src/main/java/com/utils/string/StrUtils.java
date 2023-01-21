@@ -251,7 +251,13 @@ public final class StrUtils {
 
 		final int paddingLength = length - str.length();
 		if (paddingLength > 0) {
-			stringBuilder.append(StringUtils.repeat(' ', paddingLength));
+
+			int i = 0;
+			while (i < paddingLength) {
+
+				stringBuilder.append(' ');
+				i++;
+			}
 		}
 		stringBuilder.append(str);
 	}
@@ -265,7 +271,13 @@ public final class StrUtils {
 		stringBuilder.append(str);
 		final int paddingLength = length - str.length();
 		if (paddingLength > 0) {
-			stringBuilder.append(StringUtils.repeat(' ', paddingLength));
+
+			int i = 0;
+			while (i < paddingLength) {
+
+				stringBuilder.append(' ');
+				i++;
+			}
 		}
 	}
 
@@ -389,6 +401,17 @@ public final class StrUtils {
 	public static String timeSToString(
 			final double time) {
 		return doubleToString(time, 0, 2, true) + "s";
+	}
+
+	@ApiMethod
+	public static void printRepeatedString(
+            final String string,
+            final int count,
+            final PrintStream printStream) {
+
+		for (int i = 0; i < count; i++) {
+			printStream.print(string);
+		}
 	}
 
 	@ApiMethod
@@ -772,18 +795,6 @@ public final class StrUtils {
 	}
 
 	@ApiMethod
-	public static short tryParsePositiveShort(
-			final String shortString) {
-
-		short value = -1;
-		try {
-			value = Short.parseShort(shortString);
-		} catch (final Exception ignored) {
-		}
-		return value;
-	}
-
-	@ApiMethod
 	public static Integer tryParseInt(
 			final String intString) {
 
@@ -969,7 +980,7 @@ public final class StrUtils {
 
 	@ApiMethod
 	public static String stackTraceToString(
-            final StackTraceElement[] stackTraceElementArray) {
+			final StackTraceElement[] stackTraceElementArray) {
 
 		final StringBuilder sbStackTrace = new StringBuilder();
 		for (int i = 0; i < stackTraceElementArray.length; i++) {

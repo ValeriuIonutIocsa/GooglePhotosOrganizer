@@ -12,9 +12,11 @@ import com.utils.log.Logger;
 
 public final class PathUtils {
 
-	public static final String ROOT_PATH = createRootPath();
+	private PathUtils() {
+	}
 
-	private static String createRootPath() {
+	@ApiMethod
+	public static String createRootPath() {
 
 		final String rootPath;
 		if (SystemUtils.IS_OS_WINDOWS) {
@@ -23,9 +25,6 @@ public final class PathUtils {
 			rootPath = "/mnt/d";
 		}
 		return rootPath;
-	}
-
-	private PathUtils() {
 	}
 
 	@ApiMethod
@@ -136,10 +135,25 @@ public final class PathUtils {
 	public static String computeParentPath(
 			final String pathString) {
 
+		return computeParentPath(pathString, 1);
+	}
+
+	@ApiMethod
+	public static String computeParentPath(
+			final String pathString,
+			final int levelsToGoUp) {
+
 		String folderPathString = null;
 		try {
-			final Path path = Paths.get(pathString);
-			final Path parentPath = path.getParent();
+			Path parentPath = Paths.get(pathString);
+			for (int i = 0; i < levelsToGoUp; i++) {
+
+				if (parentPath != null) {
+					parentPath = parentPath.getParent();
+				} else {
+					break;
+				}
+			}
 			if (parentPath != null) {
 				folderPathString = parentPath.toString();
 			}

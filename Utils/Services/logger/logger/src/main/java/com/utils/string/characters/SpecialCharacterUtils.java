@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public final class SpecialCharacterUtils {
 
-	public static final char MU = '\u03BC';
+	public static final char MU = 'μ';
 
 	public static final String HTML_MU = "&#181;";
 

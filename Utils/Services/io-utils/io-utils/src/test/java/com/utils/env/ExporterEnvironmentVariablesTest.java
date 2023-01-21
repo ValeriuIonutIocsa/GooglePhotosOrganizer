@@ -11,7 +11,7 @@ class ExporterEnvironmentVariablesTest {
 	void testWork() {
 
 		final String outputPathString =
-				PathUtils.computePath(PathUtils.ROOT_PATH, "env_" + StrUtils.createDateTimeString() + ".txt");
+				PathUtils.computePath(PathUtils.createRootPath(), "env_" + StrUtils.createDateTimeString() + ".txt");
 
 		final ExporterEnvironmentVariables exporterEnvironmentVariables =
 				FactoryExporterEnvironmentVariables.newInstance(outputPathString);

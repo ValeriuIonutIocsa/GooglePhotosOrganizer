@@ -8,7 +8,7 @@ import com.utils.log.Logger;
 class FileLockerTest {
 
 	private static final String LOCK_FILE_PATH_STRING =
-			PathUtils.computePath(PathUtils.ROOT_PATH, "tmp", "FileLockerTest", "lock_file.txt");
+			PathUtils.computePath(PathUtils.createRootPath(), "tmp", "FileLockerTest", "lock_file.txt");
 
 	@Test
 	void testLock() throws Exception {
