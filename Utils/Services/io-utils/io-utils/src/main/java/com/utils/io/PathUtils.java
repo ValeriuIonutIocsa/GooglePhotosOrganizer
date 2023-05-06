@@ -20,9 +20,21 @@ public final class PathUtils {
 
 		final String rootPath;
 		if (SystemUtils.IS_OS_WINDOWS) {
-			rootPath = "D:\\";
+
+			final String dDrivePathString = "D:\\";
+			if (IoUtils.directoryExists(dDrivePathString)) {
+				rootPath = dDrivePathString;
+			} else {
+				rootPath = "C:\\";
+			}
+
 		} else {
-			rootPath = "/mnt/d";
+			final String dDrivePathString = "/mnt/d";
+			if (IoUtils.directoryExists(dDrivePathString)) {
+				rootPath = dDrivePathString;
+			} else {
+				rootPath = "/mnt";
+			}
 		}
 		return rootPath;
 	}
@@ -99,17 +111,21 @@ public final class PathUtils {
 			}
 
 		} catch (final Exception exc) {
-			final StringBuilder sbErrorMessage = new StringBuilder("failed to compute ");
-			if (pathName != null) {
-				sbErrorMessage.append(pathName).append(' ');
+
+			if (verbose) {
+
+				final StringBuilder sbErrorMessage = new StringBuilder("failed to compute ");
+				if (pathName != null) {
+					sbErrorMessage.append(pathName).append(' ');
+				}
+				sbErrorMessage.append("path:")
+						.append(System.lineSeparator()).append(firstPathString);
+				for (final String otherPathString : otherPathStringArray) {
+					sbErrorMessage.append(System.lineSeparator()).append(otherPathString);
+				}
+				Logger.printError(sbErrorMessage);
+				Logger.printException(exc);
 			}
-			sbErrorMessage.append("path:")
-					.append(System.lineSeparator()).append(firstPathString);
-			for (final String otherPathString : otherPathStringArray) {
-				sbErrorMessage.append(System.lineSeparator()).append(otherPathString);
-			}
-			Logger.printError(sbErrorMessage);
-			Logger.printException(exc);
 		}
 		return pathString;
 	}

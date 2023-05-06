@@ -79,7 +79,7 @@ final class AppStartGooglePhotosOrganizer {
 		}
 
 		final boolean success =
-				FactoryFolderCreator.getInstance().createDirectories(outputFolderPathString, true);
+				FactoryFolderCreator.getInstance().createDirectories(outputFolderPathString, false, true);
 		if (!success) {
 			System.exit(-3);
 		}
@@ -145,7 +145,7 @@ final class AppStartGooglePhotosOrganizer {
 				Logger.printLine("to:");
 				Logger.printLine(outputFilePathString);
 
-				success = FactoryFileDeleter.getInstance().deleteFile(outputFilePathString, true);
+				success = FactoryFileDeleter.getInstance().deleteFile(outputFilePathString, false, true);
 				if (success) {
 
 					final ProcessBuilder processBuilder = new ProcessBuilder();
@@ -169,7 +169,7 @@ final class AppStartGooglePhotosOrganizer {
 
 		} else {
 			success = FactoryFileCopier.getInstance()
-					.copyFile(filePathString, outputFilePathString, true, true);
+					.copyFile(filePathString, outputFilePathString, true, true, true);
 		}
 		return success;
 	}

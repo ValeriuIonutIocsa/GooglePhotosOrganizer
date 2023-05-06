@@ -47,9 +47,9 @@ dependencies {
         }
     }
 
-    testFixturesImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
-    testFixturesRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
-    testFixturesRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.9.2'
+    testFixturesImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
+    testFixturesRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+    testFixturesRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.9.3'
 
     for (String testCompileClassPath : testCompileClassPaths) {
 
@@ -64,9 +64,9 @@ dependencies {
         }
     }
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.9.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.9.3'
 
     for (String testCompileClassPath : testCompileClassPaths) {
 
@@ -118,7 +118,7 @@ task fatJar(type: Jar, dependsOn: compileJava) {
     } catch (Exception ignored) {
     }
 
-    classifier = 'all'
+    archiveClassifier.set('all')
     from {
         final projects = createProjectAndDependenciesList(project)
         projects.collect {
@@ -185,7 +185,7 @@ task sourcesJar(type: Jar) {
     } catch (Exception ignored) {
     }
 
-    classifier = 'sources'
+    archiveClassifier.set('sources')
     from {
         final projects = createProjectAndDependenciesList(project)
         projects.collect { it.sourceSets.main.allSource }
@@ -219,9 +219,11 @@ File createOtherDestDir() {
         if (jarFolder.isDirectory()) {
             otherDestDir = jarFolder
         } else {
-            boolean jarFolderCreated = jarFolder.mkdir()
+            boolean jarFolderCreated = jarFolder.mkdirs()
             if (jarFolderCreated) {
                 otherDestDir = jarFolder
+            } else {
+                println 'failed to create JAR folder'
             }
         }
     }
@@ -390,7 +392,7 @@ test.onlyIf { ! Boolean.getBoolean('skip.tests') }
 
 test {
     useJUnitPlatform()
-    maxHeapSize = '8g'
+    maxHeapSize = '12g'
     outputs.upToDateWhen { false }
     testLogging {
         events "passed", "skipped", "failed", "standardOut", "standardError"
