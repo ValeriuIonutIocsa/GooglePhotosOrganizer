@@ -83,7 +83,7 @@ final class AppStartGooglePhotosOrganizer {
 			System.exit(-3);
 		}
 
-		List<String> toProcessFilePathStringList = new ArrayList<>();
+		final List<String> toProcessFilePathStringList = new ArrayList<>();
 		final List<String> filePathStringList =
 				ListFileUtils.listFilesRecursively(inputFolderPathString);
 		for (final String filePathString : filePathStringList) {
@@ -100,7 +100,7 @@ final class AppStartGooglePhotosOrganizer {
 
 		for (int i = 0; i < toProcessFilePathStringList.size(); i++) {
 
-			String filePathString = toProcessFilePathStringList.get(i);
+			final String filePathString = toProcessFilePathStringList.get(i);
 			final String jsonFilePathString = filePathString + ".json";
 			processFile(filePathString, jsonFilePathString, i, toProcessFilePathStringList.size(),
 					outputFolderPathString);
