@@ -3,6 +3,7 @@ package com.personal.g_photos;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -76,12 +77,13 @@ final class AppStartGooglePhotosOrganizer {
 			System.exit(-2);
 		}
 
-		final boolean success =
-				FactoryFolderCreator.getInstance().createDirectories(outputFolderPathString, false, true);
+		final boolean success = FactoryFolderCreator.getInstance()
+				.createDirectories(outputFolderPathString, false, true);
 		if (!success) {
 			System.exit(-3);
 		}
 
+		List<String> toProcessFilePathStringList = new ArrayList<>();
 		final List<String> filePathStringList =
 				ListFileUtils.listFilesRecursively(inputFolderPathString);
 		for (final String filePathString : filePathStringList) {
@@ -91,20 +93,30 @@ final class AppStartGooglePhotosOrganizer {
 				final String jsonFilePathString = filePathString + ".json";
 				if (IoUtils.fileExists(jsonFilePathString)) {
 
-					processFile(filePathString, jsonFilePathString, outputFolderPathString);
+					toProcessFilePathStringList.add(filePathString);
 				}
 			}
+		}
+
+		for (int i = 0; i < toProcessFilePathStringList.size(); i++) {
+
+			String filePathString = toProcessFilePathStringList.get(i);
+			final String jsonFilePathString = filePathString + ".json";
+			processFile(filePathString, jsonFilePathString, i, toProcessFilePathStringList.size(),
+					outputFolderPathString);
 		}
 	}
 
 	private static void processFile(
 			final String filePathString,
 			final String jsonFilePathString,
+			final int fileIndex,
+			final int fileCount,
 			final String outputFolderPathString) {
 
 		try {
 			Logger.printNewLine();
-			Logger.printProgress("processing file:");
+			Logger.printProgress("processing file " + fileIndex + "/" + fileCount + ":");
 			Logger.printLine(filePathString);
 
 			final String fileName = PathUtils.computeFileName(filePathString);
