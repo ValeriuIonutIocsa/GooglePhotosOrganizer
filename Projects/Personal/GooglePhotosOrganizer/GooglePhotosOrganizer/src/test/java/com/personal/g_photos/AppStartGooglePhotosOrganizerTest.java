@@ -5,6 +5,8 @@ import java.time.Instant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import com.utils.io.folder_deleters.FactoryFolderDeleter;
+
 class AppStartGooglePhotosOrganizerTest {
 
 	@Test
@@ -12,7 +14,7 @@ class AppStartGooglePhotosOrganizerTest {
 
 		final String inputFolderPathString;
 		final String outputFolderPathString;
-		final int input = Integer.parseInt("11");
+		final int input = Integer.parseInt("1");
 		if (input == 1) {
 			inputFolderPathString = "D:\\tmp\\GooglePhotosOrganizer\\SmallSampleOrig";
 			outputFolderPathString = "D:\\tmp\\GooglePhotosOrganizer\\SmallSample";
@@ -24,6 +26,11 @@ class AppStartGooglePhotosOrganizerTest {
 		} else {
 			throw new RuntimeException();
 		}
+
+		final boolean success = FactoryFolderDeleter.getInstance()
+				.deleteFolder(outputFolderPathString, true, true);
+		Assertions.assertTrue(success);
+
 		AppStartGooglePhotosOrganizer.work(inputFolderPathString, outputFolderPathString);
 	}
 

@@ -1,10 +1,6 @@
 package com.personal.g_photos;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.List;
@@ -59,7 +55,9 @@ final class AppStartGooglePhotosOrganizer {
 			System.exit(-2);
 		}
 
-		work(firstArg, secondArg);
+		final String inputFolderPathString = PathUtils.computeNormalizedPath("input folder", firstArg);
+		final String outputFolderPathString = PathUtils.computeNormalizedPath("output folder", secondArg);
+		work(inputFolderPathString, outputFolderPathString);
 
 		Logger.printNewLine();
 		Logger.printFinishMessage(start);
@@ -110,8 +108,10 @@ final class AppStartGooglePhotosOrganizer {
 			Logger.printLine(filePathString);
 
 			final String fileName = PathUtils.computeFileName(filePathString);
-			final String outputFilePathString =
-					Paths.get(outputFolderPathString, fileName).toString();
+			String outputFilePathString = PathUtils.computePath(outputFolderPathString, fileName);
+			if (outputFilePathString.endsWith(".png")) {
+				outputFilePathString = PathUtils.computePathWoExt(outputFilePathString) + ".jpg";
+			}
 
 			final boolean success = copyFile(filePathString, outputFilePathString);
 			if (success) {
@@ -119,9 +119,7 @@ final class AppStartGooglePhotosOrganizer {
 				final Instant photoTakenTimeInstant = parsePhotoTakenTimeInstant(jsonFilePathString);
 				if (photoTakenTimeInstant != null) {
 
-					final FileTime fileTime = FileTime.from(photoTakenTimeInstant);
-					final Path outputFilePath = Paths.get(outputFilePathString);
-					Files.setLastModifiedTime(outputFilePath, fileTime);
+					IoUtils.configureFileLastModifiedTime(outputFilePathString, photoTakenTimeInstant);
 				}
 			}
 
@@ -135,41 +133,116 @@ final class AppStartGooglePhotosOrganizer {
 			final String filePathString,
 			final String outputFilePathString) {
 
-		boolean success;
+		final boolean success;
 		if (filePathString.endsWith(".mp4")) {
+			success = copyVideoFile(filePathString, outputFilePathString);
 
-			success = false;
-			try {
-				Logger.printProgress("copying file:");
-				Logger.printLine(filePathString);
-				Logger.printLine("to:");
-				Logger.printLine(outputFilePathString);
+		} else if (filePathString.endsWith(".jpg")) {
+			success = copyImageFile(filePathString, outputFilePathString, ImageType.JPG);
 
-				success = FactoryFileDeleter.getInstance().deleteFile(outputFilePathString, false, true);
-				if (success) {
-
-					final ProcessBuilder processBuilder = new ProcessBuilder();
-					processBuilder.command("ffmpeg", "-i", filePathString,
-							"-vcodec", "copy", "-acodec", "copy", outputFilePathString);
-					processBuilder.directory(new File(outputFilePathString).getParentFile());
-					processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-					processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
-					final Process process = processBuilder.start();
-					final int exitCode = process.waitFor();
-					success = exitCode == 0;
-				}
-
-			} catch (final Exception exc) {
-				Logger.printError("failed to copy file " +
-						System.lineSeparator() + filePathString +
-						System.lineSeparator() + "to:" +
-						System.lineSeparator() + outputFilePathString);
-				Logger.printException(exc);
-			}
+		} else if (filePathString.endsWith(".png")) {
+			success = copyImageFile(filePathString, outputFilePathString, ImageType.PNG);
 
 		} else {
 			success = FactoryFileCopier.getInstance()
 					.copyFile(filePathString, outputFilePathString, true, true, true);
+		}
+		return success;
+	}
+
+	private static boolean copyVideoFile(
+			final String filePathString,
+			final String outputFilePathString) {
+
+		boolean success = false;
+		try {
+			Logger.printProgress("copying video file:");
+			Logger.printLine(filePathString);
+			Logger.printLine("to:");
+			Logger.printLine(outputFilePathString);
+
+			success = FactoryFileDeleter.getInstance().deleteFile(outputFilePathString, false, true);
+			if (success) {
+
+				final ProcessBuilder processBuilder = new ProcessBuilder();
+				processBuilder.command("ffmpeg", "-i", filePathString,
+						"-movflags", "use_metadata_tags", "-map_metadata", "0",
+						"-vcodec", "copy", "-acodec", "copy", outputFilePathString);
+				processBuilder.directory(new File(outputFilePathString).getParentFile());
+				processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+				processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
+				final Process process = processBuilder.start();
+				final int exitCode = process.waitFor();
+				success = exitCode == 0;
+			}
+
+		} catch (final Exception exc) {
+			Logger.printError("failed to copy file " +
+					System.lineSeparator() + filePathString +
+					System.lineSeparator() + "to:" +
+					System.lineSeparator() + outputFilePathString);
+			Logger.printException(exc);
+		}
+		return success;
+	}
+
+	private static boolean copyImageFile(
+			final String filePathString,
+			final String outputFilePathString,
+			final ImageType imageType) {
+
+		boolean success = false;
+		try {
+			Logger.printProgress("copying image file:");
+			Logger.printLine(filePathString);
+			Logger.printLine("to:");
+			Logger.printLine(outputFilePathString);
+
+			success = FactoryFileDeleter.getInstance().deleteFile(outputFilePathString, false, true);
+			if (success) {
+
+				final MetadataExporter metadataExporter = new MetadataExporter(filePathString, imageType);
+				metadataExporter.work();
+				success = metadataExporter.isSuccess();
+				if (success) {
+
+					final String scale;
+					final int imageWidth = metadataExporter.getImageWidth();
+					final int imageHeight = metadataExporter.getImageHeight();
+					if (imageWidth > imageHeight) {
+						scale = "scale=-1:1920";
+					} else {
+						scale = "scale=1920:-1";
+					}
+
+					final Process process = new ProcessBuilder()
+							.command("ffmpeg", "-i", filePathString,
+									"-movflags", "use_metadata_tags", "-map_metadata", "0",
+									"-vf", scale, outputFilePathString)
+							.directory(new File(outputFilePathString).getParentFile())
+							.redirectOutput(ProcessBuilder.Redirect.DISCARD)
+							.redirectError(ProcessBuilder.Redirect.DISCARD)
+							.start();
+					final int exitCode = process.waitFor();
+					success = exitCode == 0;
+					if (success) {
+
+						final String metadataXmlPathString = metadataExporter.getMetadataXmlPathString();
+						final MetadataImporter metadataImporter =
+								new MetadataImporter(outputFilePathString, metadataXmlPathString);
+						metadataImporter.work();
+
+						success = metadataImporter.isSuccess();
+					}
+				}
+			}
+
+		} catch (final Exception exc) {
+			Logger.printError("failed to copy file " +
+					System.lineSeparator() + filePathString +
+					System.lineSeparator() + "to:" +
+					System.lineSeparator() + outputFilePathString);
+			Logger.printException(exc);
 		}
 		return success;
 	}
