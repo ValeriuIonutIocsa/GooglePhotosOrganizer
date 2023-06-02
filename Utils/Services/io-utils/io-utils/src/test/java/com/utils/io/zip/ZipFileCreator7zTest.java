@@ -25,7 +25,7 @@ class ZipFileCreator7zTest {
 
 		final boolean deleteExisting = true;
 
-		final ZipFileCreator7z zipFileCreator7z = new ZipFileCreator7z(
+		final ZipFileCreator7z zipFileCreator7z = new ZipFileCreator7z("7z",
 				srcFilePathString, zipArchiveFilePathString, deleteExisting);
 		zipFileCreator7z.work();
 

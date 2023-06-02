@@ -14,6 +14,7 @@ import com.utils.log.Logger;
 
 public class ZipFileExtractor7z {
 
+	private final String sevenZipExecutablePathString;
 	private final String zipArchiveFilePathString;
 	private final String dstFolderPathString;
 	private final boolean deleteExisting;
@@ -21,10 +22,12 @@ public class ZipFileExtractor7z {
 	private boolean success;
 
 	public ZipFileExtractor7z(
+			final String sevenZipExecutablePathString,
 			final String zipArchiveFilePathString,
 			final String dstFolderPathString,
 			final boolean deleteExisting) {
 
+		this.sevenZipExecutablePathString = sevenZipExecutablePathString;
 		this.zipArchiveFilePathString = zipArchiveFilePathString;
 		this.dstFolderPathString = dstFolderPathString;
 		this.deleteExisting = deleteExisting;
@@ -56,7 +59,7 @@ public class ZipFileExtractor7z {
 								PathUtils.computePath(dstFolderPathString, zipArchiveNameWoExt);
 						if (IoUtils.directoryExists(extractedFilePathString)) {
 							keepGoing = FactoryFolderDeleter.getInstance()
-									.deleteFolder(extractedFilePathString, true, true);
+									.cleanFolder(extractedFilePathString, true, true);
 						} else if (IoUtils.regularFileExists(extractedFilePathString)) {
 							keepGoing = FactoryFileDeleter.getInstance()
 									.deleteFile(extractedFilePathString, true, true);
@@ -75,7 +78,7 @@ public class ZipFileExtractor7z {
 				if (keepGoing) {
 
 					final List<String> commandPartList = new ArrayList<>();
-					commandPartList.add("7z");
+					commandPartList.add(sevenZipExecutablePathString);
 					commandPartList.add("x");
 					commandPartList.add(zipArchiveFilePathString);
 					commandPartList.add("-o" + dstFolderPathString);

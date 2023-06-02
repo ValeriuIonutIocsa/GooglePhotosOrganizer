@@ -25,7 +25,7 @@ class ZipFileExtractor7zTest {
 
 		final boolean deleteExisting = true;
 
-		final ZipFileExtractor7z zipFileExtractor7z = new ZipFileExtractor7z(
+		final ZipFileExtractor7z zipFileExtractor7z = new ZipFileExtractor7z("7z",
 				zipArchiveFilePathString, dstFolderPathString, deleteExisting);
 		zipFileExtractor7z.work();
 

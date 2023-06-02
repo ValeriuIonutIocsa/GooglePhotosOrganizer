@@ -14,6 +14,7 @@ import com.utils.log.Logger;
 
 public class ZipFileCreator7z {
 
+	private final String sevenZipExecutablePathString;
 	private final String srcFilePathString;
 	private final String zipArchiveFilePathString;
 	private final boolean deleteExisting;
@@ -21,10 +22,12 @@ public class ZipFileCreator7z {
 	private boolean success;
 
 	public ZipFileCreator7z(
+			final String sevenZipExecutablePathString,
 			final String srcFilePathString,
 			final String zipArchiveFilePathString,
 			final boolean deleteExisting) {
 
+		this.sevenZipExecutablePathString = sevenZipExecutablePathString;
 		this.srcFilePathString = srcFilePathString;
 		this.zipArchiveFilePathString = zipArchiveFilePathString;
 		this.deleteExisting = deleteExisting;
@@ -54,7 +57,7 @@ public class ZipFileCreator7z {
 					if (keepGoing) {
 
 						final List<String> commandPartList = new ArrayList<>();
-						commandPartList.add("7z");
+						commandPartList.add(sevenZipExecutablePathString);
 						commandPartList.add("a");
 						commandPartList.add(zipArchiveFilePathString);
 						commandPartList.add(srcFilePathString);
