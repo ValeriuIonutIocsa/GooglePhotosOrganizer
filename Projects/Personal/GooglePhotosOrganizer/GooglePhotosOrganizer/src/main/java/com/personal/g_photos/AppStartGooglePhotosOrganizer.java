@@ -154,9 +154,26 @@ final class AppStartGooglePhotosOrganizer {
 			Logger.printLine(filePathString);
 
 			final String fileName = PathUtils.computeFileName(filePathString);
-			final String outputFilePathString = PathUtils.computePath(outputFolderPathString, fileName);
+			String outputFilePathString = PathUtils.computePath(outputFolderPathString, fileName);
 
-			final boolean success = copyFile(filePathString, outputFilePathString, verbose);
+			final boolean success;
+			if (StringUtils.endsWithIgnoreCase(filePathString, ".mp4___") ||
+					StringUtils.endsWithIgnoreCase(filePathString, ".mov___")) {
+
+				success = copyVideoFile(filePathString, outputFilePathString, verbose);
+
+			} else if (StringUtils.endsWithIgnoreCase(filePathString, ".jpg") ||
+					StringUtils.endsWithIgnoreCase(filePathString, ".jpeg") ||
+					StringUtils.endsWithIgnoreCase(filePathString, ".png") ||
+					StringUtils.endsWithIgnoreCase(filePathString, ".heic___")) {
+
+				outputFilePathString = PathUtils.computePathWoExt(outputFilePathString) + ".jpg";
+				success = copyImageFile(filePathString, outputFilePathString, verbose);
+
+			} else {
+				success = FactoryFileCopier.getInstance()
+						.copyFile(filePathString, outputFilePathString, true, true, true);
+			}
 			if (success) {
 
 				final Instant photoTakenTimeInstant = parsePhotoTakenTimeInstant(jsonFilePathString);
@@ -170,32 +187,6 @@ final class AppStartGooglePhotosOrganizer {
 			Logger.printError("failed to process file:" + System.lineSeparator() + filePathString);
 			Logger.printException(exc);
 		}
-	}
-
-	private static boolean copyFile(
-			final String filePathString,
-			final String outputFilePathString,
-			final boolean verbose) {
-
-		final boolean success;
-		if (StringUtils.endsWithIgnoreCase(filePathString, ".mp4___") ||
-				StringUtils.endsWithIgnoreCase(filePathString, ".mov___")) {
-
-			success = copyVideoFile(filePathString, outputFilePathString, verbose);
-
-		} else if (StringUtils.endsWithIgnoreCase(filePathString, ".jpg") ||
-				StringUtils.endsWithIgnoreCase(filePathString, ".jpeg") ||
-				StringUtils.endsWithIgnoreCase(filePathString, ".png") ||
-				StringUtils.endsWithIgnoreCase(filePathString, ".heic___")) {
-
-			final String jpgOutputFilePathString = PathUtils.computePathWoExt(outputFilePathString) + ".jpg";
-			success = copyImageFile(filePathString, jpgOutputFilePathString, verbose);
-
-		} else {
-			success = FactoryFileCopier.getInstance()
-					.copyFile(filePathString, outputFilePathString, true, true, true);
-		}
-		return success;
 	}
 
 	private static boolean copyVideoFile(
