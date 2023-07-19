@@ -3,11 +3,12 @@
   <component name="SaveActionSettings">
     <option name="actions">
       <set>
-        <option value="activateOnShortcut" />
+        <option value="activate" />
         <option value="organizeImports" />
         <option value="reformat" />
         <option value="fieldCanBeFinal" />
         <option value="localCanBeFinalExceptImplicit" />
+        <option value="methodMayBeStatic" />
         <option value="missingOverrideAnnotation" />
         <option value="useBlocks" />
         <option value="generateSerialVersionUID" />

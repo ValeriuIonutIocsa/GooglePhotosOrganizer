@@ -12,26 +12,45 @@ class AppStartGooglePhotosOrganizerTest {
 	@Test
 	void testWork() {
 
-		final String inputFolderPathString;
-		final String outputFolderPathString;
-		final int input = Integer.parseInt("1");
+		final String[] args;
+		final int input = Integer.parseInt("11");
 		if (input == 1) {
-			inputFolderPathString = "D:\\tmp\\GooglePhotosOrganizer\\SmallSampleOrig";
-			outputFolderPathString = "D:\\tmp\\GooglePhotosOrganizer\\SmallSample";
+			args = new String[] {
+					"D:\\tmp\\GooglePhotosOrganizer\\SmallSampleOrig",
+					"D:\\tmp\\GooglePhotosOrganizer\\SmallSample",
+					"-verbose"
+			};
+
+		} else if (input == 2) {
+			args = new String[] {
+					"D:\\tmp\\GooglePhotosOrganizer\\SmallSample2Orig",
+					"D:\\tmp\\GooglePhotosOrganizer\\SmallSample2",
+					"-verbose"
+			};
 
 		} else if (input == 11) {
-			inputFolderPathString = "D:\\IVI_MISC\\Misc\\mnf\\steff\\GPhotos__new";
-			outputFolderPathString = "D:\\IVI_MISC\\Misc\\mnf\\steff\\GPhotos__new_org";
+			args = new String[] {
+					"D:\\tmp\\GooglePhotosOrganizer\\IphoneSampleOrig",
+					"D:\\tmp\\GooglePhotosOrganizer\\IphoneSample",
+					"-verbose",
+					// "-keep_live_photo_videos"
+			};
+
+		} else if (input == 101) {
+			args = new String[] {
+					"D:\\IVI_MISC\\Misc\\mnf\\steff\\GPhotos__new",
+					"D:\\IVI_MISC\\Misc\\mnf\\steff\\GPhotos__new_org"
+			};
 
 		} else {
 			throw new RuntimeException();
 		}
 
 		final boolean success = FactoryFolderDeleter.getInstance()
-				.deleteFolder(outputFolderPathString, true, true);
+				.deleteFolder(args[1], true, true);
 		Assertions.assertTrue(success);
 
-		AppStartGooglePhotosOrganizer.work(inputFolderPathString, outputFolderPathString);
+		AppStartGooglePhotosOrganizer.work(args);
 	}
 
 	@Test

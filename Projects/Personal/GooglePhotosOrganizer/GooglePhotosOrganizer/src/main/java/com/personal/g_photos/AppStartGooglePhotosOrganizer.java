@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,61 +30,68 @@ final class AppStartGooglePhotosOrganizer {
 		final Instant start = Instant.now();
 		Logger.setDebugMode(true);
 
-		final String firstArg;
-		if (args.length >= 1) {
-			firstArg = args[0];
-		} else {
-			firstArg = null;
-		}
-		if (StringUtils.isBlank(firstArg)) {
-			Logger.printError("invalid first argument");
-			System.exit(-1);
-		}
+		if (args.length >= 1 && "-help".equals(args[0])) {
 
-		if ("/?".equals(firstArg) || "--help".equals(firstArg)) {
-			Logger.printLine("usage: google_photos_organizer INPUT_FOLDER_PATH OUTPUT_FOLDER_PATH");
+			final String usageMessage = createUsageMessage();
+			Logger.printLine(usageMessage);
 			System.exit(0);
 		}
 
-		final String secondArg;
-		if (args.length >= 2) {
-			secondArg = args[1];
-		} else {
-			secondArg = null;
-		}
-		if (StringUtils.isBlank(secondArg)) {
-			Logger.printError("invalid second argument");
-			System.exit(-2);
+		if (args.length < 2) {
+
+			final String usageMessage = createUsageMessage();
+			Logger.printError("insufficient arguments" + System.lineSeparator() + usageMessage);
+			System.exit(1);
 		}
 
-		final String inputFolderPathString = PathUtils.computeNormalizedPath("input folder", firstArg);
-		final String outputFolderPathString = PathUtils.computeNormalizedPath("output folder", secondArg);
-		work(inputFolderPathString, outputFolderPathString);
+		work(args);
 
 		Logger.printNewLine();
 		Logger.printFinishMessage(start);
 	}
 
+	private static String createUsageMessage() {
+
+		return "usage: google_photos_organizer <INPUT_FOLDER_PATH> <OUTPUT_FOLDER_PATH> " +
+				"(-verbose) (-keep_live_photo_videos)";
+	}
+
 	static void work(
-			final String inputFolderPathString,
-			final String outputFolderPathString) {
+			final String[] args) {
 
 		Logger.printNewLine();
 		Logger.printProgress("GooglePhotosOrganizer starting");
 
+		final String inputFolderPathString = PathUtils.computeNormalizedPath("input folder", args[0]);
+		if (StringUtils.isBlank(inputFolderPathString)) {
+
+			Logger.printError("invalid input folder path");
+			System.exit(2);
+		}
+
+		final String outputFolderPathString = PathUtils.computeNormalizedPath("output folder", args[1]);
+		if (StringUtils.isBlank(outputFolderPathString)) {
+
+			Logger.printError("invalid output folder path");
+			System.exit(3);
+		}
+
+		final boolean verbose = args.length >= 3 && "-verbose".equals(args[2]);
+		final boolean keepLivePhotoVideos = args.length >= 4 && "-keep_live_photo_videos".equals(args[3]);
+
 		if (!IoUtils.fileExists(inputFolderPathString)) {
 
 			Logger.printError("input folder does not exist");
-			System.exit(-2);
+			System.exit(3);
 		}
 
 		final boolean success = FactoryFolderCreator.getInstance()
 				.createDirectories(outputFolderPathString, false, true);
 		if (!success) {
-			System.exit(-3);
+			System.exit(4);
 		}
 
-		final List<String> toProcessFilePathStringList = new ArrayList<>();
+		final List<FileData> toProcessFileDataList = new ArrayList<>();
 		final List<String> filePathStringList =
 				ListFileUtils.listFilesRecursively(inputFolderPathString);
 		for (final String filePathString : filePathStringList) {
@@ -93,26 +101,52 @@ final class AppStartGooglePhotosOrganizer {
 				final String jsonFilePathString = filePathString + ".json";
 				if (IoUtils.fileExists(jsonFilePathString)) {
 
-					toProcessFilePathStringList.add(filePathString);
+					final FileData fileData = new FileData(filePathString, jsonFilePathString);
+					toProcessFileDataList.add(fileData);
+				}
+
+				if (keepLivePhotoVideos) {
+
+					final String extension = PathUtils.computeExtension(filePathString);
+					if (!StringUtils.equalsIgnoreCase(extension, "mp4")) {
+
+						final String mp4FilePathString = PathUtils.computePathWoExt(filePathString) + ".mp4";
+						if (IoUtils.fileExists(mp4FilePathString)) {
+
+							final FileData fileData = new FileData(mp4FilePathString, jsonFilePathString);
+							toProcessFileDataList.add(fileData);
+						}
+					}
+					if (!StringUtils.equalsIgnoreCase(extension, "mov")) {
+
+						final String movFilePathString = PathUtils.computePathWoExt(filePathString) + ".mov";
+						if (IoUtils.fileExists(movFilePathString)) {
+
+							final FileData fileData = new FileData(movFilePathString, jsonFilePathString);
+							toProcessFileDataList.add(fileData);
+						}
+					}
 				}
 			}
 		}
 
-		for (int i = 0; i < toProcessFilePathStringList.size(); i++) {
+		for (int i = 0; i < toProcessFileDataList.size(); i++) {
 
-			final String filePathString = toProcessFilePathStringList.get(i);
-			final String jsonFilePathString = filePathString + ".json";
-			processFile(filePathString, jsonFilePathString, i, toProcessFilePathStringList.size(),
-					outputFolderPathString);
+			final FileData fileData = toProcessFileDataList.get(i);
+			final String filePathString = fileData.getFilePathString();
+			final String jsonFilePathString = fileData.getJsonFilePathString();
+			processFile(filePathString, jsonFilePathString, i, toProcessFileDataList.size(),
+					outputFolderPathString, verbose);
 		}
 	}
 
 	private static void processFile(
-			final String filePathString,
-			final String jsonFilePathString,
-			final int fileIndex,
-			final int fileCount,
-			final String outputFolderPathString) {
+            final String filePathString,
+            final String jsonFilePathString,
+            final int fileIndex,
+            final int fileCount,
+            final String outputFolderPathString,
+            final boolean verbose) {
 
 		try {
 			Logger.printNewLine();
@@ -122,7 +156,7 @@ final class AppStartGooglePhotosOrganizer {
 			final String fileName = PathUtils.computeFileName(filePathString);
 			final String outputFilePathString = PathUtils.computePath(outputFolderPathString, fileName);
 
-			final boolean success = copyFile(filePathString, outputFilePathString);
+			final boolean success = copyFile(filePathString, outputFilePathString, verbose);
 			if (success) {
 
 				final Instant photoTakenTimeInstant = parsePhotoTakenTimeInstant(jsonFilePathString);
@@ -139,17 +173,20 @@ final class AppStartGooglePhotosOrganizer {
 	}
 
 	private static boolean copyFile(
-			final String filePathString,
-			final String outputFilePathString) {
+            final String filePathString,
+            final String outputFilePathString,
+            final boolean verbose) {
 
 		final boolean success;
-		if (filePathString.endsWith(".mp4")) {
-			success = copyVideoFile(filePathString, outputFilePathString);
+		if (StringUtils.endsWithIgnoreCase(filePathString, ".mp4___") ||
+				StringUtils.endsWithIgnoreCase(filePathString, ".mov___")) {
+			success = copyVideoFile(filePathString, outputFilePathString, verbose);
 
-		} else if (filePathString.endsWith(".jpg") ||
-				filePathString.endsWith(".jpeg") ||
-				filePathString.endsWith(".png")) {
-			success = copyImageFile(filePathString, outputFilePathString);
+		} else if (StringUtils.endsWithIgnoreCase(filePathString, ".jpg") ||
+				StringUtils.endsWithIgnoreCase(filePathString, ".jpeg") ||
+				StringUtils.endsWithIgnoreCase(filePathString, ".png") ||
+				StringUtils.endsWithIgnoreCase(filePathString, ".heic___")) {
+			success = copyImageFile(filePathString, outputFilePathString, verbose);
 
 		} else {
 			success = FactoryFileCopier.getInstance()
@@ -160,7 +197,8 @@ final class AppStartGooglePhotosOrganizer {
 
 	private static boolean copyVideoFile(
 			final String filePathString,
-			final String outputFilePathString) {
+			final String outputFilePathString,
+			final boolean verbose) {
 
 		boolean success = false;
 		try {
@@ -175,10 +213,18 @@ final class AppStartGooglePhotosOrganizer {
 				final ProcessBuilder processBuilder = new ProcessBuilder();
 				processBuilder.command("ffmpeg", "-i", filePathString,
 						"-movflags", "use_metadata_tags", "-map_metadata", "0",
-						"-vcodec", "copy", "-acodec", "copy", outputFilePathString);
+						"-vcodec", "copy", "-c:a", "aac", outputFilePathString);
 				processBuilder.directory(new File(outputFilePathString).getParentFile());
-				processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-				processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
+
+				final ProcessBuilder.Redirect processBuilderRedirect;
+				if (verbose) {
+					processBuilderRedirect = ProcessBuilder.Redirect.INHERIT;
+				} else {
+					processBuilderRedirect = ProcessBuilder.Redirect.DISCARD;
+				}
+
+				processBuilder.redirectOutput(processBuilderRedirect);
+				processBuilder.redirectError(processBuilderRedirect);
 				final Process process = processBuilder.start();
 				final int exitCode = process.waitFor();
 				success = exitCode == 0;
@@ -196,12 +242,20 @@ final class AppStartGooglePhotosOrganizer {
 
 	private static boolean copyImageFile(
 			final String filePathString,
-			final String outputFilePathString) {
+			final String outputFilePathString,
+			final boolean verbose) {
 
 		boolean success = false;
 		try {
+			final List<String> commandPartList = new ArrayList<>();
+			Collections.addAll(commandPartList, "cmd",
+					"/c", "img_resizer", "1920", filePathString, outputFilePathString);
+			if (verbose) {
+				commandPartList.add("-verbose");
+			}
+
 			final Process process = new ProcessBuilder()
-					.command("cmd", "/c", "img_resizer", "1920", filePathString, outputFilePathString)
+					.command(commandPartList)
 					.directory(new File(outputFilePathString).getParentFile())
 					.redirectOutput(ProcessBuilder.Redirect.INHERIT)
 					.redirectError(ProcessBuilder.Redirect.INHERIT)
