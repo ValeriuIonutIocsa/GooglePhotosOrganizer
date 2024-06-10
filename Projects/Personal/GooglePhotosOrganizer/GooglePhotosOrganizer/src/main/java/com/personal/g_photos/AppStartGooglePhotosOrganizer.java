@@ -92,8 +92,14 @@ final class AppStartGooglePhotosOrganizer {
 		}
 
 		final List<FileData> toProcessFileDataList = new ArrayList<>();
-		final List<String> filePathStringList =
-				ListFileUtils.listFilesRecursively(inputFolderPathString);
+		final List<String> filePathStringList = new ArrayList<>();
+		ListFileUtils.visitFilesRecursively(inputFolderPathString,
+				dirPath -> {
+				},
+				filePath -> {
+					final String filePathString = filePath.toString();
+					filePathStringList.add(filePathString);
+				});
 		for (final String filePathString : filePathStringList) {
 
 			if (!IoUtils.directoryExists(filePathString)) {
@@ -133,8 +139,8 @@ final class AppStartGooglePhotosOrganizer {
 		for (int i = 0; i < toProcessFileDataList.size(); i++) {
 
 			final FileData fileData = toProcessFileDataList.get(i);
-			final String filePathString = fileData.getFilePathString();
-			final String jsonFilePathString = fileData.getJsonFilePathString();
+			final String filePathString = fileData.filePathString();
+			final String jsonFilePathString = fileData.jsonFilePathString();
 			processFile(filePathString, jsonFilePathString, i, toProcessFileDataList.size(),
 					outputFolderPathString, verbose);
 		}
@@ -164,8 +170,9 @@ final class AppStartGooglePhotosOrganizer {
 
 			} else if (StringUtils.endsWithIgnoreCase(filePathString, ".jpg") ||
 					StringUtils.endsWithIgnoreCase(filePathString, ".jpeg") ||
+					StringUtils.endsWithIgnoreCase(filePathString, ".heic") ||
 					StringUtils.endsWithIgnoreCase(filePathString, ".png") ||
-					StringUtils.endsWithIgnoreCase(filePathString, ".heic___")) {
+					StringUtils.endsWithIgnoreCase(filePathString, ".webp")) {
 
 				outputFilePathString = PathUtils.computePathWoExt(outputFilePathString) + ".jpg";
 				success = copyImageFile(filePathString, outputFilePathString, verbose);
@@ -204,12 +211,6 @@ final class AppStartGooglePhotosOrganizer {
 			success = FactoryFileDeleter.getInstance().deleteFile(outputFilePathString, false, true);
 			if (success) {
 
-				final ProcessBuilder processBuilder = new ProcessBuilder();
-				processBuilder.command("ffmpeg", "-i", filePathString,
-						"-movflags", "use_metadata_tags", "-map_metadata", "0",
-						"-vcodec", "copy", "-c:a", "aac", outputFilePathString);
-				processBuilder.directory(new File(outputFilePathString).getParentFile());
-
 				final ProcessBuilder.Redirect processBuilderRedirect;
 				if (verbose) {
 					processBuilderRedirect = ProcessBuilder.Redirect.INHERIT;
@@ -217,9 +218,14 @@ final class AppStartGooglePhotosOrganizer {
 					processBuilderRedirect = ProcessBuilder.Redirect.DISCARD;
 				}
 
-				processBuilder.redirectOutput(processBuilderRedirect);
-				processBuilder.redirectError(processBuilderRedirect);
-				final Process process = processBuilder.start();
+				final Process process = new ProcessBuilder()
+						.command("ffmpeg", "-i", filePathString,
+								"-movflags", "use_metadata_tags", "-map_metadata", "0",
+								"-vcodec", "copy", "-c:a", "aac", outputFilePathString)
+						.directory(new File(outputFilePathString).getParentFile())
+						.redirectOutput(processBuilderRedirect)
+						.redirectError(processBuilderRedirect).start();
+
 				final int exitCode = process.waitFor();
 				success = exitCode == 0;
 			}
@@ -254,6 +260,7 @@ final class AppStartGooglePhotosOrganizer {
 					.redirectOutput(ProcessBuilder.Redirect.INHERIT)
 					.redirectError(ProcessBuilder.Redirect.INHERIT)
 					.start();
+
 			final int exitCode = process.waitFor();
 			success = exitCode == 0;
 

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.utils.io.folder_deleters.FactoryFolderDeleter;
+import com.utils.test.TestInputUtils;
 
 class AppStartGooglePhotosOrganizerTest {
 
@@ -13,7 +14,7 @@ class AppStartGooglePhotosOrganizerTest {
 	void testWork() {
 
 		final String[] args;
-		final int input = Integer.parseInt("11");
+		final int input = TestInputUtils.parseTestInputNumber("11");
 		if (input == 1) {
 			args = new String[] {
 					"D:\\tmp\\GooglePhotosOrganizer\\SmallSampleOrig",
