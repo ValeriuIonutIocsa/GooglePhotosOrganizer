@@ -50,14 +50,8 @@ public class ZipFileExtractor7z {
 				final boolean keepGoing;
 				if (deleteExisting) {
 
-					String zipArchiveNameWoExt = null;
-					final String suffix = ".zip";
 					final String zipArchiveName = PathUtils.computeFileName(archiveFilePathString);
-					if (zipArchiveName.endsWith(suffix)) {
-						zipArchiveNameWoExt =
-								zipArchiveName.substring(0, zipArchiveName.length() - suffix.length());
-					}
-
+					final String zipArchiveNameWoExt = StrUtils.removeSuffixIgnoreCase(zipArchiveName, ".zip");
 					if (StringUtils.isNotBlank(zipArchiveNameWoExt)) {
 
 						final String extractedFilePathString =

@@ -196,6 +196,44 @@ public final class StrUtils {
 	}
 
 	@ApiMethod
+	public static long parseStartAddressFromAddressInterval(
+			final String addressInterval) {
+
+		long startAddress = -1;
+		try {
+			final String middleString = " - ";
+			final int index = addressInterval.indexOf(middleString);
+			if (index > 0) {
+
+				final String startAddressString = addressInterval.substring(0, index);
+				startAddress = StrUtils.tryParsePositiveLongFromHexString(startAddressString);
+			}
+
+		} catch (final Exception ignored) {
+		}
+		return startAddress;
+	}
+
+	@ApiMethod
+	public static long parseEndAddressFromAddressInterval(
+			final String addressInterval) {
+
+		long endAddress = -1;
+		try {
+			final String middleString = " - ";
+			final int index = addressInterval.indexOf(middleString);
+			if (index > 0) {
+
+				final String endAddressString = addressInterval.substring(index + middleString.length());
+				endAddress = StrUtils.tryParsePositiveLongFromHexString(endAddressString);
+			}
+
+		} catch (final Exception ignored) {
+		}
+		return endAddress;
+	}
+
+	@ApiMethod
 	public static String createHexString(
 			final long value) {
 
@@ -712,6 +750,14 @@ public final class StrUtils {
 
 	@ApiMethod
 	public static String durationToString(
+			final Instant start) {
+
+		final Duration duration = Duration.between(start, Instant.now());
+		return durationToString(duration);
+	}
+
+	@ApiMethod
+	public static String durationToString(
 			final Duration duration) {
 
 		final StringBuilder stringBuilder = new StringBuilder();
@@ -841,6 +887,26 @@ public final class StrUtils {
 	}
 
 	@ApiMethod
+	public static String removePrefixIgnoreCase(
+			final String str,
+			final String prefix) {
+
+		final String resultStr;
+		if (str != null) {
+
+			if (StringUtils.startsWithIgnoreCase(str, prefix)) {
+				resultStr = str.substring(prefix.length());
+			} else {
+				resultStr = str;
+			}
+
+		} else {
+			resultStr = null;
+		}
+		return resultStr;
+	}
+
+	@ApiMethod
 	public static String removeSuffix(
 			final String str,
 			final String suffix) {
@@ -849,6 +915,26 @@ public final class StrUtils {
 		if (str != null) {
 
 			if (str.endsWith(suffix)) {
+				resultStr = str.substring(0, str.length() - suffix.length());
+			} else {
+				resultStr = str;
+			}
+
+		} else {
+			resultStr = null;
+		}
+		return resultStr;
+	}
+
+	@ApiMethod
+	public static String removeSuffixIgnoreCase(
+			final String str,
+			final String suffix) {
+
+		final String resultStr;
+		if (str != null) {
+
+			if (StringUtils.endsWithIgnoreCase(str, suffix)) {
 				resultStr = str.substring(0, str.length() - suffix.length());
 			} else {
 				resultStr = str;

@@ -49,14 +49,8 @@ public final class SevenZipFileExtractor7z {
 				final boolean keepGoing;
 				if (deleteExisting) {
 
-					String zipArchiveNameWoExt = null;
-					final String suffix = ".7z";
 					final String zipArchiveName = PathUtils.computeFileName(archiveFilePathString);
-					if (zipArchiveName.endsWith(suffix)) {
-						zipArchiveNameWoExt =
-								zipArchiveName.substring(0, zipArchiveName.length() - suffix.length());
-					}
-
+					final String zipArchiveNameWoExt = StrUtils.removeSuffixIgnoreCase(zipArchiveName, ".7z");
 					if (StringUtils.isNotBlank(zipArchiveNameWoExt)) {
 
 						final String extractedFilePathString =

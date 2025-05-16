@@ -5,7 +5,9 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
@@ -100,40 +102,11 @@ final class AppStartGooglePhotosOrganizer {
 					final String filePathString = filePath.toString();
 					filePathStringList.add(filePathString);
 				});
-		for (final String filePathString : filePathStringList) {
 
-			if (!IoUtils.directoryExists(filePathString)) {
+		fillToProcessFileDataList(filePathStringList, toProcessFileDataList);
 
-				final String jsonFilePathString = filePathString + ".json";
-				if (IoUtils.fileExists(jsonFilePathString)) {
-
-					final FileData fileData = new FileData(filePathString, jsonFilePathString);
-					toProcessFileDataList.add(fileData);
-				}
-
-				if (keepLivePhotoVideos) {
-
-					final String extension = PathUtils.computeExtension(filePathString);
-					if (!StringUtils.equalsIgnoreCase(extension, "mp4")) {
-
-						final String mp4FilePathString = PathUtils.computePathWoExt(filePathString) + ".mp4";
-						if (IoUtils.fileExists(mp4FilePathString)) {
-
-							final FileData fileData = new FileData(mp4FilePathString, jsonFilePathString);
-							toProcessFileDataList.add(fileData);
-						}
-					}
-					if (!StringUtils.equalsIgnoreCase(extension, "mov")) {
-
-						final String movFilePathString = PathUtils.computePathWoExt(filePathString) + ".mov";
-						if (IoUtils.fileExists(movFilePathString)) {
-
-							final FileData fileData = new FileData(movFilePathString, jsonFilePathString);
-							toProcessFileDataList.add(fileData);
-						}
-					}
-				}
-			}
+		if (keepLivePhotoVideos) {
+			addLivePhotoVideosFileData(toProcessFileDataList);
 		}
 
 		for (int i = 0; i < toProcessFileDataList.size(); i++) {
@@ -143,6 +116,71 @@ final class AppStartGooglePhotosOrganizer {
 			final String jsonFilePathString = fileData.jsonFilePathString();
 			processFile(filePathString, jsonFilePathString, i, toProcessFileDataList.size(),
 					outputFolderPathString, verbose);
+		}
+	}
+
+	private static void addLivePhotoVideosFileData(
+			final List<FileData> toProcessFileDataList) {
+
+		for (final FileData toProcessFileData : toProcessFileDataList) {
+
+			final String filePathString = toProcessFileData.filePathString();
+			final String jsonFilePathString = toProcessFileData.jsonFilePathString();
+
+			final String extension = PathUtils.computeExtension(filePathString);
+			if (!StringUtils.equalsIgnoreCase(extension, "mp4")) {
+
+				final String mp4FilePathString = PathUtils.computePathWoExt(filePathString) + ".mp4";
+				if (IoUtils.fileExists(mp4FilePathString)) {
+
+					final FileData fileData = new FileData(mp4FilePathString, jsonFilePathString);
+					toProcessFileDataList.add(fileData);
+				}
+			}
+			if (!StringUtils.equalsIgnoreCase(extension, "mov")) {
+
+				final String movFilePathString = PathUtils.computePathWoExt(filePathString) + ".mov";
+				if (IoUtils.fileExists(movFilePathString)) {
+
+					final FileData fileData = new FileData(movFilePathString, jsonFilePathString);
+					toProcessFileDataList.add(fileData);
+				}
+			}
+		}
+	}
+
+	private static void fillToProcessFileDataList(
+			final List<String> filePathStringList,
+			final List<FileData> toProcessFileDataList) {
+
+		final Set<String> filePathStringSet = new HashSet<>(filePathStringList);
+		for (final String jsonFilePathString : filePathStringList) {
+
+			if (StringUtils.endsWithIgnoreCase(jsonFilePathString, ".json")) {
+
+				boolean mediaFile = false;
+				String mediaFilePathString = jsonFilePathString;
+				while (true) {
+
+					final int lastIndex = mediaFilePathString.lastIndexOf('.');
+					if (lastIndex < 0) {
+						break;
+
+					} else {
+						mediaFilePathString = mediaFilePathString.substring(0, lastIndex);
+						if (filePathStringSet.contains(mediaFilePathString)) {
+
+							mediaFile = true;
+							break;
+						}
+					}
+				}
+				if (mediaFile) {
+
+					final FileData fileData = new FileData(mediaFilePathString, jsonFilePathString);
+					toProcessFileDataList.add(fileData);
+				}
+			}
 		}
 	}
 
