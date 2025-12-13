@@ -63,7 +63,7 @@ class AppStartGooglePhotosOrganizerTest {
 	@Test
 	void testParseInstantFromString() {
 
-		final String dateString = "Nov 2, 2022, 4:54:41\u202fPM UTC";
+		final String dateString = "13 Sept 2023, 13:31:27 UTC";
 		final Instant instant = AppStartGooglePhotosOrganizer.parseInstantFromString(dateString);
 		Assertions.assertNotNull(instant);
 	}

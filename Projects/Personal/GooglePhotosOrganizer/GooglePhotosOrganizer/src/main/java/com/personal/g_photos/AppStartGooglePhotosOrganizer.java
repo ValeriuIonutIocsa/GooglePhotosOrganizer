@@ -337,13 +337,15 @@ final class AppStartGooglePhotosOrganizer {
 
 		Instant instant = null;
 		try {
-			final String processedFormattedPhotoTakenTime =
+			String processedFormattedPhotoTakenTime =
 					StringUtils.replaceChars(formattedPhotoTakenTime, '\u202f', ' ');
+			processedFormattedPhotoTakenTime =
+					Strings.CS.replace(processedFormattedPhotoTakenTime, "Sept", "Sep");
 			instant = new SimpleDateFormat("dd MMM yyyy, HH:mm:ss z")
 					.parse(processedFormattedPhotoTakenTime).toInstant();
 
 		} catch (final Throwable throwable) {
-			Logger.printError("failed to parse data from string " + formattedPhotoTakenTime);
+			Logger.printError("failed to parse instant from string " + formattedPhotoTakenTime);
 			Logger.printThrowable(throwable);
 		}
 		return instant;
