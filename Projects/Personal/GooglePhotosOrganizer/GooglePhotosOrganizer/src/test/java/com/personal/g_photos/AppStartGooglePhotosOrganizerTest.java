@@ -14,33 +14,39 @@ class AppStartGooglePhotosOrganizerTest {
 	void testWork() {
 
 		final String[] args;
-		final int input = TestInputUtils.parseTestInputNumber("11");
+		final int input = TestInputUtils.parseTestInputNumber("102");
 		if (input == 1) {
 			args = new String[] {
-					"D:\\tmp\\GooglePhotosOrganizer\\SmallSampleOrig",
-					"D:\\tmp\\GooglePhotosOrganizer\\SmallSample",
+					"D:\\IVI_PERS\\Tmp\\GooglePhotosOrganizer\\SmallSampleOrig",
+					"D:\\IVI_PERS\\Tmp\\GooglePhotosOrganizer\\SmallSample",
 					"-verbose"
 			};
 
 		} else if (input == 2) {
 			args = new String[] {
-					"D:\\tmp\\GooglePhotosOrganizer\\SmallSample2Orig",
-					"D:\\tmp\\GooglePhotosOrganizer\\SmallSample2",
+					"D:\\IVI_PERS\\Tmp\\GooglePhotosOrganizer\\SmallSample2Orig",
+					"D:\\IVI_PERS\\Tmp\\GooglePhotosOrganizer\\SmallSample2",
 					"-verbose"
 			};
 
 		} else if (input == 11) {
 			args = new String[] {
-					"D:\\tmp\\GooglePhotosOrganizer\\IphoneSampleOrig",
-					"D:\\tmp\\GooglePhotosOrganizer\\IphoneSample",
+					"D:\\IVI_PERS\\Tmp\\GooglePhotosOrganizer\\IphoneSampleOrig",
+					"D:\\IVI_PERS\\Tmp\\GooglePhotosOrganizer\\IphoneSample",
 					"-verbose",
-					// "-keep_live_photo_videos"
+					"-keep_live_photo_videos"
 			};
 
 		} else if (input == 101) {
 			args = new String[] {
 					"D:\\IVI_MISC\\Misc\\mnf\\steff\\GPhotos__new",
 					"D:\\IVI_MISC\\Misc\\mnf\\steff\\GPhotos__new_org"
+			};
+
+		} else if (input == 102) {
+			args = new String[] {
+					"D:\\IVI\\Misc\\mnf\\mama\\Takeout",
+					"D:\\IVI\\Misc\\mnf\\mama\\Takeout_org"
 			};
 
 		} else {

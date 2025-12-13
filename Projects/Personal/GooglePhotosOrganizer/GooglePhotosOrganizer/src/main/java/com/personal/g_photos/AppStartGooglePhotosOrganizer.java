@@ -339,7 +339,7 @@ final class AppStartGooglePhotosOrganizer {
 		try {
 			final String processedFormattedPhotoTakenTime =
 					StringUtils.replaceChars(formattedPhotoTakenTime, '\u202f', ' ');
-			instant = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss a z")
+			instant = new SimpleDateFormat("dd MMM yyyy, HH:mm:ss z")
 					.parse(processedFormattedPhotoTakenTime).toInstant();
 
 		} catch (final Throwable throwable) {
