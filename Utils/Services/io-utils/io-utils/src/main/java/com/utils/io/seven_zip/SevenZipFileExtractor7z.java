@@ -111,8 +111,8 @@ public final class SevenZipFileExtractor7z {
 				}
 			}
 
-		} catch (final Exception exc) {
-			Logger.printException(exc);
+		} catch (final Throwable throwable) {
+			Logger.printThrowable(throwable);
 
 		} finally {
 			ProgressIndicators.getInstance().update(0.0);

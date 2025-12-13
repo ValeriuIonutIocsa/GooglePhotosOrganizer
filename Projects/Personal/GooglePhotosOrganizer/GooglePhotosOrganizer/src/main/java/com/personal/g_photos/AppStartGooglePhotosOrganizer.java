@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.json.JSONObject;
 
 import com.utils.io.IoUtils;
@@ -128,7 +129,7 @@ final class AppStartGooglePhotosOrganizer {
 			final String jsonFilePathString = toProcessFileData.jsonFilePathString();
 
 			final String extension = PathUtils.computeExtension(filePathString);
-			if (!StringUtils.equalsIgnoreCase(extension, "mp4")) {
+			if (!Strings.CI.equals(extension, "mp4")) {
 
 				final String mp4FilePathString = PathUtils.computePathWoExt(filePathString) + ".mp4";
 				if (IoUtils.fileExists(mp4FilePathString)) {
@@ -137,7 +138,7 @@ final class AppStartGooglePhotosOrganizer {
 					toProcessFileDataList.add(fileData);
 				}
 			}
-			if (!StringUtils.equalsIgnoreCase(extension, "mov")) {
+			if (!Strings.CI.equals(extension, "mov")) {
 
 				final String movFilePathString = PathUtils.computePathWoExt(filePathString) + ".mov";
 				if (IoUtils.fileExists(movFilePathString)) {
@@ -156,7 +157,7 @@ final class AppStartGooglePhotosOrganizer {
 		final Set<String> filePathStringSet = new HashSet<>(filePathStringList);
 		for (final String jsonFilePathString : filePathStringList) {
 
-			if (StringUtils.endsWithIgnoreCase(jsonFilePathString, ".json")) {
+			if (Strings.CI.endsWith(jsonFilePathString, ".json")) {
 
 				boolean mediaFile = false;
 				String mediaFilePathString = jsonFilePathString;
@@ -201,16 +202,16 @@ final class AppStartGooglePhotosOrganizer {
 			String outputFilePathString = PathUtils.computePath(outputFolderPathString, fileName);
 
 			final boolean success;
-			if (StringUtils.endsWithIgnoreCase(filePathString, ".mp4___") ||
-					StringUtils.endsWithIgnoreCase(filePathString, ".mov___")) {
+			if (Strings.CI.endsWith(filePathString, ".mp4___") ||
+					Strings.CI.endsWith(filePathString, ".mov___")) {
 
 				success = copyVideoFile(filePathString, outputFilePathString, verbose);
 
-			} else if (StringUtils.endsWithIgnoreCase(filePathString, ".jpg") ||
-					StringUtils.endsWithIgnoreCase(filePathString, ".jpeg") ||
-					StringUtils.endsWithIgnoreCase(filePathString, ".heic") ||
-					StringUtils.endsWithIgnoreCase(filePathString, ".png") ||
-					StringUtils.endsWithIgnoreCase(filePathString, ".webp")) {
+			} else if (Strings.CI.endsWith(filePathString, ".jpg") ||
+					Strings.CI.endsWith(filePathString, ".jpeg") ||
+					Strings.CI.endsWith(filePathString, ".heic") ||
+					Strings.CI.endsWith(filePathString, ".png") ||
+					Strings.CI.endsWith(filePathString, ".webp")) {
 
 				outputFilePathString = PathUtils.computePathWoExt(outputFilePathString) + ".jpg";
 				success = copyImageFile(filePathString, outputFilePathString, verbose);
@@ -228,9 +229,9 @@ final class AppStartGooglePhotosOrganizer {
 				}
 			}
 
-		} catch (final Exception exc) {
+		} catch (final Throwable throwable) {
 			Logger.printError("failed to process file:" + System.lineSeparator() + filePathString);
-			Logger.printException(exc);
+			Logger.printThrowable(throwable);
 		}
 	}
 
@@ -268,12 +269,12 @@ final class AppStartGooglePhotosOrganizer {
 				success = exitCode == 0;
 			}
 
-		} catch (final Exception exc) {
+		} catch (final Throwable throwable) {
 			Logger.printError("failed to copy file " +
 					System.lineSeparator() + filePathString +
 					System.lineSeparator() + "to:" +
 					System.lineSeparator() + outputFilePathString);
-			Logger.printException(exc);
+			Logger.printThrowable(throwable);
 		}
 		return success;
 	}
@@ -302,8 +303,8 @@ final class AppStartGooglePhotosOrganizer {
 			final int exitCode = process.waitFor();
 			success = exitCode == 0;
 
-		} catch (final Exception exc) {
-			Logger.printException(exc);
+		} catch (final Throwable throwable) {
+			Logger.printThrowable(throwable);
 		}
 		return success;
 	}
@@ -323,10 +324,10 @@ final class AppStartGooglePhotosOrganizer {
 
 			photoTakenTimeInstant = parseInstantFromString(formattedPhotoTakenTime);
 
-		} catch (final Exception exc) {
+		} catch (final Throwable throwable) {
 			Logger.printProgress("failed to parse photo taken time from JSON file:" +
 					System.lineSeparator() + jsonFilePathString);
-			Logger.printException(exc);
+			Logger.printThrowable(throwable);
 		}
 		return photoTakenTimeInstant;
 	}
@@ -341,9 +342,9 @@ final class AppStartGooglePhotosOrganizer {
 			instant = new SimpleDateFormat("MMM dd, yyyy, HH:mm:ss a z")
 					.parse(processedFormattedPhotoTakenTime).toInstant();
 
-		} catch (final Exception exc) {
+		} catch (final Throwable throwable) {
 			Logger.printError("failed to parse data from string " + formattedPhotoTakenTime);
-			Logger.printException(exc);
+			Logger.printThrowable(throwable);
 		}
 		return instant;
 	}
