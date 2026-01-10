@@ -114,28 +114,8 @@ final class AppStartGooglePhotosOrganizer {
 		for (int i = 0; i < toProcessFileDataList.size(); i++) {
 
 			final FileData fileData = toProcessFileDataList.get(i);
-
-			String filePathString = fileData.filePathString();
-			String jsonFilePathString = fileData.jsonFilePathString();
-
-			final char nnbspChar = '\u202F';
-			if (StringUtils.contains(filePathString, nnbspChar)) {
-
-				final String processedFilePathString =
-						StringUtils.replaceChars(filePathString, nnbspChar, ' ');
-				FactoryFileMover.getInstance()
-						.moveFile(filePathString, processedFilePathString, true, true);
-				filePathString = processedFilePathString;
-			}
-			if (StringUtils.contains(jsonFilePathString, nnbspChar)) {
-
-				final String processedJsonFilePathString =
-						StringUtils.replaceChars(jsonFilePathString, nnbspChar, ' ');
-				FactoryFileMover.getInstance()
-						.moveFile(jsonFilePathString, processedJsonFilePathString, true, true);
-				jsonFilePathString = processedJsonFilePathString;
-			}
-
+			final String filePathString = fileData.filePathString();
+			final String jsonFilePathString = fileData.jsonFilePathString();
 			processFile(filePathString, jsonFilePathString, i, toProcessFileDataList.size(),
 					outputFolderPathString, verbose);
 		}
@@ -207,8 +187,8 @@ final class AppStartGooglePhotosOrganizer {
 	}
 
 	private static void processFile(
-			final String filePathString,
-			final String jsonFilePathString,
+			final String filePathStringParam,
+			final String jsonFilePathStringParam,
 			final int fileIndex,
 			final int fileCount,
 			final String outputFolderPathString,
@@ -217,7 +197,28 @@ final class AppStartGooglePhotosOrganizer {
 		try {
 			Logger.printNewLine();
 			Logger.printProgress("processing file " + fileIndex + "/" + fileCount + ":");
-			Logger.printLine(filePathString);
+			Logger.printLine(filePathStringParam);
+
+			String filePathString = filePathStringParam;
+			String jsonFilePathString = jsonFilePathStringParam;
+
+			final char nnbspChar = '\u202F';
+			if (StringUtils.contains(filePathString, nnbspChar)) {
+
+				final String processedFilePathString =
+						StringUtils.replaceChars(filePathString, nnbspChar, ' ');
+				FactoryFileMover.getInstance()
+						.moveFile(filePathString, processedFilePathString, true, true);
+				filePathString = processedFilePathString;
+			}
+			if (StringUtils.contains(jsonFilePathString, nnbspChar)) {
+
+				final String processedJsonFilePathString =
+						StringUtils.replaceChars(jsonFilePathString, nnbspChar, ' ');
+				FactoryFileMover.getInstance()
+						.moveFile(jsonFilePathString, processedJsonFilePathString, true, true);
+				jsonFilePathString = processedJsonFilePathString;
+			}
 
 			final String fileName = PathUtils.computeFileName(filePathString);
 			String outputFilePathString = PathUtils.computePath(outputFolderPathString, fileName);
@@ -251,7 +252,7 @@ final class AppStartGooglePhotosOrganizer {
 			}
 
 		} catch (final Throwable throwable) {
-			Logger.printError("failed to process file:" + System.lineSeparator() + filePathString);
+			Logger.printError("failed to process file:" + System.lineSeparator() + filePathStringParam);
 			Logger.printThrowable(throwable);
 		}
 	}
