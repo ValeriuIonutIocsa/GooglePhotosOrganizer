@@ -20,7 +20,7 @@ class AppStartGooglePhotosOrganizerTest {
 	void testWork() {
 
 		final String[] args;
-		final int input = TestInputUtils.parseTestInputNumber("102");
+		final int input = TestInputUtils.parseTestInputNumber("21");
 		if (input == 1) {
 			args = new String[] {
 					"D:\\IVI_PERS\\Tmp\\GooglePhotosOrganizer\\SmallSampleOrig",
@@ -41,6 +41,13 @@ class AppStartGooglePhotosOrganizerTest {
 					"D:\\IVI_PERS\\Tmp\\GooglePhotosOrganizer\\IphoneSample",
 					"-verbose",
 					"-keep_live_photo_videos"
+			};
+
+		} else if (input == 21) {
+			args = new String[] {
+					"D:\\IVI_PERS\\Tmp\\GooglePhotosOrganizer\\SpecialCharactersSampleOrig",
+					"D:\\IVI_PERS\\Tmp\\GooglePhotosOrganizer\\SpecialCharactersSample",
+					"-verbose"
 			};
 
 		} else if (input == 101) {

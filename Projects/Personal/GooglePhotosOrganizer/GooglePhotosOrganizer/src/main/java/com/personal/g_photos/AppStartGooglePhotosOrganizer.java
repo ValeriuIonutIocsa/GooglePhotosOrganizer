@@ -19,6 +19,7 @@ import com.utils.io.PathUtils;
 import com.utils.io.ReaderUtils;
 import com.utils.io.file_copiers.FactoryFileCopier;
 import com.utils.io.file_deleters.FactoryFileDeleter;
+import com.utils.io.file_movers.FactoryFileMover;
 import com.utils.io.folder_creators.FactoryFolderCreator;
 import com.utils.log.Logger;
 
@@ -113,8 +114,28 @@ final class AppStartGooglePhotosOrganizer {
 		for (int i = 0; i < toProcessFileDataList.size(); i++) {
 
 			final FileData fileData = toProcessFileDataList.get(i);
-			final String filePathString = fileData.filePathString();
-			final String jsonFilePathString = fileData.jsonFilePathString();
+
+			String filePathString = fileData.filePathString();
+			String jsonFilePathString = fileData.jsonFilePathString();
+
+			final char nnbspChar = '\u202F';
+			if (StringUtils.contains(filePathString, nnbspChar)) {
+
+				final String processedFilePathString =
+						StringUtils.replaceChars(filePathString, nnbspChar, ' ');
+				FactoryFileMover.getInstance()
+						.moveFile(filePathString, processedFilePathString, true, true);
+				filePathString = processedFilePathString;
+			}
+			if (StringUtils.contains(jsonFilePathString, nnbspChar)) {
+
+				final String processedJsonFilePathString =
+						StringUtils.replaceChars(jsonFilePathString, nnbspChar, ' ');
+				FactoryFileMover.getInstance()
+						.moveFile(jsonFilePathString, processedJsonFilePathString, true, true);
+				jsonFilePathString = processedJsonFilePathString;
+			}
+
 			processFile(filePathString, jsonFilePathString, i, toProcessFileDataList.size(),
 					outputFolderPathString, verbose);
 		}
