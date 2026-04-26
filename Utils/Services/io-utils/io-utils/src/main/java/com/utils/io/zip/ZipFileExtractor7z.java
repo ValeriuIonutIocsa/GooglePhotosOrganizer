@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import com.utils.io.IoUtils;
 import com.utils.io.PathUtils;
@@ -20,6 +21,7 @@ import com.utils.string.StrUtils;
 public class ZipFileExtractor7z {
 
 	private final String sevenZipExecutablePathString;
+	private final int threadCount;
 	private final String archiveFilePathString;
 	private final String outputParentFolderPathString;
 	private final boolean deleteExisting;
@@ -28,11 +30,13 @@ public class ZipFileExtractor7z {
 
 	public ZipFileExtractor7z(
 			final String sevenZipExecutablePathString,
+			final int threadCount,
 			final String archiveFilePathString,
 			final String outputParentFolderPathString,
 			final boolean deleteExisting) {
 
 		this.sevenZipExecutablePathString = sevenZipExecutablePathString;
+		this.threadCount = threadCount;
 		this.archiveFilePathString = archiveFilePathString;
 		this.outputParentFolderPathString = outputParentFolderPathString;
 		this.deleteExisting = deleteExisting;
@@ -51,7 +55,7 @@ public class ZipFileExtractor7z {
 				if (deleteExisting) {
 
 					final String zipArchiveName = PathUtils.computeFileName(archiveFilePathString);
-					final String zipArchiveNameWoExt = StrUtils.removeSuffixIgnoreCase(zipArchiveName, ".zip");
+					final String zipArchiveNameWoExt = Strings.CI.removeEnd(zipArchiveName, ".zip");
 					if (StringUtils.isNotBlank(zipArchiveNameWoExt)) {
 
 						final String extractedFilePathString =
@@ -83,6 +87,9 @@ public class ZipFileExtractor7z {
 					commandPartList.add(sevenZipExecutablePathString);
 					commandPartList.add("x");
 					commandPartList.add("-bsp1");
+					if (threadCount >= 1) {
+						commandPartList.add("-mmt=" + threadCount);
+					}
 					commandPartList.add("-y");
 					commandPartList.add(archiveFilePathString);
 					commandPartList.add("-o" + outputParentFolderPathString);

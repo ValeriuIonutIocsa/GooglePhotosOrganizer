@@ -1,6 +1,7 @@
 package com.personal.g_photos;
 
 import java.io.File;
+import java.nio.file.FileVisitResult;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -98,11 +99,11 @@ final class AppStartGooglePhotosOrganizer {
 		final List<FileData> toProcessFileDataList = new ArrayList<>();
 		final List<String> filePathStringList = new ArrayList<>();
 		ListFileUtils.visitFilesRecursively(inputFolderPathString,
-				dirPath -> {
-				},
+				dirPath -> FileVisitResult.CONTINUE,
 				filePath -> {
 					final String filePathString = filePath.toString();
 					filePathStringList.add(filePathString);
+					return FileVisitResult.CONTINUE;
 				});
 
 		fillToProcessFileDataList(filePathStringList, toProcessFileDataList);
