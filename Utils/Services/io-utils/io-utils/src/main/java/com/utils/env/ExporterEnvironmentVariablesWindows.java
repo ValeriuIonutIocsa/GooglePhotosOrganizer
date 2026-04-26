@@ -1,5 +1,6 @@
 package com.utils.env;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -31,9 +32,10 @@ public class ExporterEnvironmentVariablesWindows implements ExporterEnvironmentV
 					.redirectErrorStream(true)
 					.start();
 
+			final InputStream inputStream = process.getInputStream();
 			final InputStreamReaderThread inputStreamReaderThread = new InputStreamReaderThread(
-					"env", process.getInputStream(),
-					StandardCharsets.UTF_8, new ReadBytesHandlerOutputStream(outputStream));
+					"env", inputStream, StandardCharsets.UTF_8,
+					new ReadBytesHandlerOutputStream(outputStream));
 			inputStreamReaderThread.start();
 
 			process.waitFor();
